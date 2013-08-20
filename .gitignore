@@ -1,0 +1,8 @@
+sample/gen
+sdk/bin
+sdk/gen
+sdk/.classpath
+sdk/.settings/org.eclipse.jdt.core.prefs
+
+sample/bin
+sample/lint.xml
