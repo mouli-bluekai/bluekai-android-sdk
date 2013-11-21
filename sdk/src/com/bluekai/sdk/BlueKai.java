@@ -50,7 +50,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private boolean devMode = false;
 	private Activity activity = null;
 	private Context context = null;
-	private String baseURL = "http://199.204.23.142/m/";
+	private String baseURL = "http://199.204.23.142/m.html";
 	private String siteId = "2";
 	private String realURL = null;
 	private String appVersion = "1.0";
@@ -79,7 +79,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		}
 		this.listener = listener;
 		this.handler = handler;
-		realURL = baseURL + siteId;
+		realURL = baseURL + "?site=" + siteId;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
 		Logger.debug(TAG, " onCreate BK URL --> " + baseURL);
 		database = BlueKaiDataSource.getInstance(context);
@@ -402,7 +402,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		private String getURL() throws UnsupportedEncodingException {
 			StringBuffer buffer = null;
-			String url = realURL + "?";
+			String url = realURL + "&";
 			String queryPart = "";
 			Iterator<Params> it = paramsList.iterator();
 			buffer = new StringBuffer();
