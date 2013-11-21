@@ -1,7 +1,7 @@
 # Integrating the BlueKai SDK
 ## Download the BlueKai SDK for Android
 
-http://199.204.23.142/bk-mobile/BlueKai_Android_SDK-20130824.zip
+- [Full SDK](http://199.204.23.142/bk-mobile/BlueKai_Android_SDK-20131122.zip)
 
 ### Obtain BlueKai site ID
 
