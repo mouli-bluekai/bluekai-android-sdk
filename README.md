@@ -6,28 +6,29 @@
       
 The current version of the SDK is 1.0.0. 
 
+## Updating the SDK 
+
+Update, unless otherwise indicated, can be done by just copying over
+the previous version. 
+
 ### Obtain BlueKai site ID
 
 For any demo projects a site id of "2" can be used.
-
 
 ### Add BlueKai SDK to Project
 
 Copy the downloaded SDK (jar file) to your local folder. In your
 project, create a folder named “libs” if it does not exist already.
 
-
    ![Screenshot](http://199.204.23.142/bk-mobile/android/image001.png)
 
 Copy bluekai.jar to the libs folder. Right click on your project and
 select “Properties”.
 
-
    ![Screenshot](http://199.204.23.142/bk-mobile/android/image003.png)
 
 Select “Java Build Path” from the left side of the properties window
 and select “Libraries” tab from the right side.
-
 
    ![Screenshot](http://199.204.23.142/bk-mobile/android/image005.png)
 
