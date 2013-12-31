@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
+import android.provider.Settings.Secure;
 import android.support.v4.app.FragmentManager;
 import android.telephony.TelephonyManager;
 import android.webkit.WebSettings;
@@ -50,7 +51,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private boolean devMode = false;
 	private Activity activity = null;
 	private Context context = null;
-	private String baseURL = "http://199.204.23.142/m/";
+	private String baseURL = "http://bluekai.github.io/m.html";
 	private String siteId = "2";
 	private String realURL = null;
 	private String appVersion = "1.0";
@@ -79,7 +80,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		}
 		this.listener = listener;
 		this.handler = handler;
-		realURL = baseURL + siteId;
+		realURL = baseURL + "?site=" + siteId;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
 		Logger.debug(TAG, " onCreate BK URL --> " + baseURL);
 		database = BlueKaiDataSource.getInstance(context);
@@ -402,7 +403,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		private String getURL() throws UnsupportedEncodingException {
 			StringBuffer buffer = null;
-			String url = realURL + "?";
+			String url = realURL + "&";
 			String queryPart = "";
 			Iterator<Params> it = paramsList.iterator();
 			buffer = new StringBuffer();
@@ -542,20 +543,18 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	private String getImei(Context ctx) {
-		String imei = "";
+		String androidId = "";
 		try {
-			if (teleMgr == null) {
-				teleMgr = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-			}
-			imei = teleMgr.getDeviceId();
+			androidId = Secure.getString(ctx.getContentResolver(), Secure.ANDROID_ID);
+			Logger.debug(TAG, "Android ID --> " + androidId);
 		} catch (Exception e1) {
 			Logger.error(TAG, "IMEIManager :: Exception in processData" + e1.getMessage());
 		}
 
-		if ((imei == null) || (imei.equals("")) || (imei.equals("0") || (imei.startsWith("00000")))) {
-			imei = getPsudeoIMEI();
+		if ((androidId == null) || (androidId.equals("")) || (androidId.equals("0") || (androidId.startsWith("00000")))) {
+			androidId = getPsudeoIMEI();
 		}
-		return imei;
+		return androidId;
 	}
 
 	private String getPsudeoIMEI() {

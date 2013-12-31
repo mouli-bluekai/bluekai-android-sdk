@@ -2,9 +2,9 @@
 
 ## Download the BlueKai SDK for Android
 
-- [Full SDK](http://199.204.23.142/bk-mobile/BlueKai_Android_SDK-20130808.zip)
+- [Full SDK](http://bluekai.github.io/BlueKai_Android_SDK-20131122.zip)
       
-The current version of the SDK is 1.0.0. 
+The current version of the SDK is 1.0.1. 
 
 ## Updating the SDK 
 
@@ -20,27 +20,27 @@ For any demo projects a site id of "2" can be used.
 Copy the downloaded SDK (jar file) to your local folder. In your
 project, create a folder named “libs” if it does not exist already.
 
-   ![Screenshot](http://199.204.23.142/bk-mobile/android/image001.png)
+   ![Screenshot](http://bluekai.github.io/images/android/image001.png)
 
 Copy bluekai.jar to the libs folder. Right click on your project and
 select “Properties”.
 
-   ![Screenshot](http://199.204.23.142/bk-mobile/android/image003.png)
+   ![Screenshot](http://bluekai.github.io/images/android/image003.png)
 
 Select “Java Build Path” from the left side of the properties window
 and select “Libraries” tab from the right side.
 
-   ![Screenshot](http://199.204.23.142/bk-mobile/android/image005.png)
+   ![Screenshot](http://bluekai.github.io/images/android/image005.png)
 
 Click “Add JARs” button. Select “bluekai.jar” from project/libs/
 folder and select “OK” button.
 
-   ![Screenshot](http://199.204.23.142/bk-mobile/android/image007.png)
+   ![Screenshot](http://bluekai.github.io/images/android/image007.png)
 
 Goto “Order and Export” tab on the properties window and check
 “bluekai.jar” and click “OK”.
 
-   ![Screenshot](http://199.204.23.142/bk-mobile/android/image009.png)
+   ![Screenshot](http://bluekai.github.io/images/android/image009.png)
 
 ### Edit AndroidManifest.xml
 
@@ -203,11 +203,11 @@ void | showSettingsScreen(SettingsChangedListener listener) |Method to show Blue
 A sample application is available in the main repository.  After
 building you should see the following: 
 
-![Screenshot](http://199.204.23.142/bk-mobile/android/BlueKaiActivity-release-unsigned.png)
+![Screenshot](http://bluekai.github.io/images/android/BlueKaiActivity-release-unsigned.png)
 
 You can also test this directly by installing 
 
-- [BlueKai Sample Application](http://199.204.23.142/bk-mobile/android/BlueKaiActivity-release-unsigned.apk)
+- [BlueKai Sample Application](http://bluekai.github.io/images/android/BlueKaiActivity-release-unsigned.apk)
    
 If monitoring network requests you would see something like: 
 ```

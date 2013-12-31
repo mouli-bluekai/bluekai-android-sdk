@@ -1,0 +1,10 @@
+* v1.0.0
+
+Initial SDK release. 
+
+- Initial release
+- Pass individual hints or collections 
+
+* v1.0.1
+
+
