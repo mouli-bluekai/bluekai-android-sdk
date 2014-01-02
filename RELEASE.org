@@ -7,4 +7,5 @@ Initial SDK release.
 
 * v1.0.1
 
+- Mobile proxy end-point
 
