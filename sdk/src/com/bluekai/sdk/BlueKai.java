@@ -51,7 +51,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private boolean devMode = false;
 	private Activity activity = null;
 	private Context context = null;
-	private String baseURL = "http://bluekai.github.io/m.html";
+	private String baseURL = "http://mobileproxy.bluekai.com/m.html";
 	private String siteId = "2";
 	private String realURL = null;
 	private String appVersion = "1.0";
