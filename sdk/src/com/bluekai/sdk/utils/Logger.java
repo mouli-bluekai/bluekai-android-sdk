@@ -21,7 +21,12 @@ public class Logger {
 
 	public static void debug(String tag, String message) {
 		if (Constants.debug) {
-			Log.d(tag, message);
+			String fullCName = Thread.currentThread().getStackTrace()[3].getClassName();
+			String cName = fullCName.substring(fullCName.lastIndexOf(".") + 1);
+			String method = Thread.currentThread().getStackTrace()[3].getMethodName();
+			int line = Thread.currentThread().getStackTrace()[3].getLineNumber();
+
+			Log.d(cName + "." + method + "():" + line, message);
 		}
 	}
 

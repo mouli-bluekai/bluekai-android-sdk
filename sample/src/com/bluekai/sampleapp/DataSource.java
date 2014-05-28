@@ -61,6 +61,7 @@ public class DataSource {
 			ContentValues values = new ContentValues();
 			values.put(DataSourceOpenHelper.DEVSETTINGS_BKURL, devSettings.getBkurl());
 			values.put(DataSourceOpenHelper.DEVSETTINGS_DEVMODE, devSettings.isDevMode());
+			values.put(DataSourceOpenHelper.DEVSETTINGS_USEHTTPS, devSettings.isUseHttps());
 			database.insert("devsettings", null, values);
 		} catch (Exception ex) {
 			Log.e("DataSource", "Error while creating settings --> ", ex);
@@ -79,6 +80,7 @@ public class DataSource {
 			while (!cursor.isAfterLast()) {
 				devSettings.setBkurl(cursor.getString(cursor.getColumnIndex(DataSourceOpenHelper.DEVSETTINGS_BKURL)));
 				devSettings.setDevMode(getBoolean(cursor, DataSourceOpenHelper.DEVSETTINGS_DEVMODE));
+				devSettings.setUseHttps(getBoolean(cursor, DataSourceOpenHelper.DEVSETTINGS_USEHTTPS));
 				cursor.moveToNext();
 			}
 		}

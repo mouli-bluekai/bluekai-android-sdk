@@ -19,6 +19,7 @@ public class DevSettings {
 
 	private String bkurl;
 	private boolean devMode;
+	private boolean useHttps;
 
 	public boolean isDevMode() {
 		return devMode;
@@ -26,6 +27,14 @@ public class DevSettings {
 
 	public void setDevMode(boolean devMode) {
 		this.devMode = devMode;
+	}
+
+	public boolean isUseHttps() {
+		return useHttps;
+	}
+
+	public void setUseHttps(boolean useHttps) {
+		this.useHttps = useHttps;
 	}
 
 	public void setBkurl(String bkurl) {

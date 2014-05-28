@@ -46,6 +46,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 	//private EditText pairsCountText = null;
 
 	private boolean devMode = false;
+	private boolean useHttps = false;
 	private String siteId = null;
 	private String appVersion = "4.1.6";
 
@@ -71,6 +72,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 					Properties properties = new Properties();
 					properties.load(inputStream);
 					devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
+					useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
 					siteId = properties.getProperty("siteid");
 				} catch (IOException e) {
 					Log.e("BlueKaiSampleApp", "Error loading properties. Default values will be loaded from SDK", e);
@@ -78,9 +80,10 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 			} else {
 				siteId = devSettings.getBkurl();
 				devMode = devSettings.isDevMode();
+				useHttps = devSettings.isUseHttps();
 			}
 
-			bk = BlueKai.getInstance(this, this, devMode, siteId, appVersion, this, new Handler());
+			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
 			bk.setFragmentManager(getSupportFragmentManager());
 
 			keyText = (EditText) findViewById(R.id.keyText);
@@ -151,6 +154,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 				InputStream inputStream = assetManager.open("settings.properties");
 				Properties properties = new Properties();
 				properties.load(inputStream);
+				useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
 				devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
 				siteId = properties.getProperty("siteid");
 			} catch (IOException e) {
@@ -159,9 +163,10 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 		} else {
 			siteId = devSettings.getBkurl();
 			devMode = devSettings.isDevMode();
+			useHttps = devSettings.isUseHttps();
 		}
-		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId);
-		bk = BlueKai.getInstance(this, this, devMode, siteId, appVersion, this, new Handler());
+		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId + " -- Use Https --> " + useHttps);
+		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
 		bk.resume();
 	}
 

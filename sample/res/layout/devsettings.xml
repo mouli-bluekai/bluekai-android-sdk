@@ -10,6 +10,14 @@
         android:layout_toRightOf="@+id/devmodelabel"
         android:text="" />
 
+    <CheckBox
+        android:id="@+id/useHttps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/useHttpslabel"
+        android:layout_below="@+id/devmodelabel"
+        android:text="" />
+
     <EditText
         android:id="@+id/serverurl"
         android:layout_width="match_parent"
@@ -25,10 +33,22 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/devmodelabel"
-        android:layout_below="@+id/devmodelabel"
+        android:layout_alignLeft="@+id/useHttpslabel"
+        android:layout_below="@+id/useHttpslabel"
         android:layout_marginTop="30dp"
         android:text="Site ID"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/useHttpslabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_alignLeft="@+id/devmodelabel"
+        android:layout_below="@+id/devmodelabel"
+        android:text="Use Https"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
