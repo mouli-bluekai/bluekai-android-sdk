@@ -30,7 +30,6 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.support.v4.app.FragmentManager;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.widget.RelativeLayout;
@@ -45,7 +44,6 @@ import com.bluekai.sdk.utils.Logger;
 
 public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private final String TAG = "BlueKai";
-	private final String TC = "TC";
 	private static BlueKai instance = null;
 
 	private boolean devMode = false;
@@ -363,8 +361,20 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * 
 	 * @param map
 	 *            Map with keys and values
+	 * @deprecated as of release v1.0.3. Replaced by {@link #putAll(java.util.Map)}
 	 */
+	@Deprecated
 	public void put(Map<String, String> map) {
+		sendData(map);
+	}
+
+	/**
+	 * Convenience method to send a bunch of key-value pairs to BlueKai
+	 *
+	 * @param map
+	 *            Map with keys and values
+	 */
+	public void putAll(Map<String, String> map) {
 		sendData(map);
 	}
 
@@ -488,7 +498,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private void sendData(Map<String, String> paramsMap) {
 		Logger.debug(TAG, "IsAllowDataPosting --> " + settings.isAllowDataPosting());
-		Logger.debug(TAG, "TC? --> " + paramsMap.containsKey(TC));
 		ParamsList paramsList = new ParamsList();
 		Iterator<String> it = paramsMap.keySet().iterator();
 		while (it.hasNext()) {
@@ -499,7 +508,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			params.setValue(value);
 			paramsList.add(params);
 		}
-		if (settings.isAllowDataPosting() || paramsMap.containsKey(TC)) {
+		if (settings.isAllowDataPosting()) {
 			SendData sendData = new SendData(paramsList, handler, false);
 			Thread thread = new Thread(sendData);
 			thread.start();

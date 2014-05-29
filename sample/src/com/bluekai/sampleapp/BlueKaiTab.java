@@ -119,24 +119,6 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 					}
 				}
 			});
-
-			/*pushButton = (Button) findViewById(R.id.push);
-			pushButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					int count = Integer.parseInt(pairsCountText.getText().toString());
-					if (count < 1 || count > 2000) {
-						Toast.makeText(context, "Out of range. Enter a number between 1 and 2000", Toast.LENGTH_LONG)
-								.show();
-					} else {
-						Map<String, String> paramsMap = new HashMap<String, String>();
-						for (int i = 0; i < count; i++) {
-							paramsMap.put("test" + i, "value" + i);
-						}
-						bk.put(paramsMap);
-					}
-				}
-			});*/
 		} catch (Exception ex) {
 			Log.e("BlueKaiTab", "Error while creating", ex);
 		}
@@ -173,6 +155,5 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 	@Override
 	public void onDataPosted(boolean success, String message) {
 		Log.d("BlueKaiSampleApp", String.valueOf(success) + " :: " + message);
-		// Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 	}
 }
