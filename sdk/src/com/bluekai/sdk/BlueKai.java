@@ -388,20 +388,41 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Method to set user opt-in or opt-out preference
 	 * 
-	 * @param optin
+	 * @param optIn
+	 *            Opt-in (true or false)
+	 * @Deprecated as of release v1.0.3. Replaced by {@link #setOptInPreference(boolean)}
+	 */
+	@Deprecated
+	public void setOptIn(boolean optIn) {
+		setOptInPreference(optIn);
+	}
+
+	/**
+	 * Method to set user opt-in or opt-out preference
+	 *
+	 * @param optIn
 	 *            Opt-in (true or false)
 	 */
-	public void setOptIn(boolean optin) {
-		this.settings.setAllowDataPosting(optin);
+	public void setOptInPreference(boolean optIn) {
+		this.settings.setAllowDataPosting(optIn);
 		if (database != null) {
 			database.createSettings(this.settings);
 		}
 	}
 
 	/**
+	 * Method to get user opt-in or opt-out preference
+	 *
+	 * @return user's opt-in or opt-out preference
+	 */
+	public boolean getOptInPreference() {
+		return this.settings.isAllowDataPosting();
+	}
+
+	/**
 	 * Method to check if useHttps is enabled. If useHttps is set then data is sent to BlueKai over https
 	 *
-	 * @return boolean secureMode
+	 * @return useHttps flag that enables/disables data being sent to BlueKai over https.
 	 */
 	public boolean isUseHttps() {
 		return useHttps;
@@ -656,7 +677,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		if (settings.isAllowDataPosting()) {
 			checkForExistingData();
 		}
-		sendData("TC", String.valueOf(settings.isAllowDataPosting() ? 1 : 0));
 	}
 
 	private synchronized void showBlueKaiDialog(String url, boolean existingData, ParamsList paramsList,
