@@ -52,8 +52,10 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private Activity activity = null;
 	private Context context = null;
 	private boolean useHttps = false;
-	private String baseURL = "http://mobileproxy.bluekai.com/m.html";
-	private String baseURLSecured = "https://mobileproxy.bluekai.com/m.html";
+	private final String HTTP = "http://";
+	private final String HTTPS = "https://";
+	private final String BASE_URL = "mobileproxy.bluekai.com/m.html";
+	private final String SANDBOX_URL = "mobileproxy.bluekai.com/m-sandbox.html";
 	private String siteId = "2";
 	private String appVersion = "1.0";
 	private String imei = "";
@@ -87,7 +89,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.handler = handler;
 		this.useHttps = useHttps;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
-		Logger.debug(TAG, " onCreate BK URL --> " + (useHttps ? baseURLSecured : baseURL));
+		Logger.debug(TAG, " onCreate BK URL --> " + (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL));
 		database = BlueKaiDataSource.getInstance(context);
 		database.setSettingsChangedListener(this);
 		settings = database.getSettings();
@@ -540,7 +542,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		private String getURL() throws UnsupportedEncodingException {
 			StringBuffer buffer = null;
-			String url = (useHttps ? baseURLSecured : baseURL) + "?site=" + getSiteId() + "&";
+			String url = (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL) + "?site=" + getSiteId() + "&";
 			String queryPart = "";
 			Iterator<Params> it = paramsList.iterator();
 			buffer = new StringBuffer();
