@@ -30,7 +30,6 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.support.v4.app.FragmentManager;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.widget.RelativeLayout;
@@ -44,8 +43,7 @@ import com.bluekai.sdk.model.Settings;
 import com.bluekai.sdk.utils.Logger;
 
 public class BlueKai implements SettingsChangedListener, BKViewListener {
-	private final String TAG = "BlueKai";
-	private final String TC = "TC";
+	private final static String TAG = "BlueKai";
 	private static BlueKai instance = null;
 
 	private boolean devMode = false;
@@ -67,7 +65,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private Handler handler;
 
 	private BlueKai() {
-		this.devMode = false;
+		database = BlueKaiDataSource.getInstance(context);
+		database.setSettingsChangedListener(this);
+		settings = database.getSettings();
 	}
 
 	private BlueKai(Activity activity, Context context, boolean devMode, String siteId, String appVersion,
@@ -80,6 +80,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.activity = activity;
 		this.context = context;
 		this.devMode = devMode;
+		Logger.setDebug(devMode);
 		this.appVersion = appVersion;
 		this.imei = getImei(context);
 		if (!TextUtils.isEmpty(siteId) && !this.siteId.equals(siteId)) {
@@ -143,13 +144,14 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, String siteId,
 			String appVersion, DataPostedListener listener, Handler handler) {
-		Logger.debug("BlueKai", "Called get instance...");
+		Logger.debug(TAG, "Called get instance...");
 		if (instance == null) {
 			instance = new BlueKai(activity, context, devMode, siteId, appVersion, listener, handler);
 		} else {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
 			instance.setDevMode(devMode);
+			Logger.setDebug(devMode);
 			instance.setSiteId(siteId);
 			instance.setAppVersion(appVersion);
 			instance.setDataPostedListener(listener);
@@ -184,13 +186,14 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
     public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId,
                                       String appVersion, DataPostedListener listener, Handler handler) {
-        Logger.debug("BlueKai", "Called get instance...");
+        Logger.debug(TAG, "Called get instance...");
         if (instance == null) {
             instance = new BlueKai(activity, context, devMode, useHttps, siteId, appVersion, listener, handler);
         } else {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
 			instance.setDevMode(devMode);
+			Logger.setDebug(devMode);
 			instance.setUseHttps(useHttps);
 			instance.setSiteId(siteId);
 			instance.setAppVersion(appVersion);
@@ -201,14 +204,18 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * Convenience method to initialize and get instance of BlueKai without
-	 * arguments
+	 * Convenience method to initialize and get instance of BlueKai without arguments.
+	 * This method returns the previously created instance, if any, or returns an instance 
+	 * with bare minimum settings initialized. In ideal cases, first create a BlueKai
+	 * instance using the other two getInstance() methods that take arguments and then subsequently 
+	 * use this method to get previously created instance.
 	 * 
 	 * @return BlueKai instance
 	 */
 	public static BlueKai getInstance() {
-		Logger.debug("BlueKai", "Called get instance...");
+		Logger.debug(TAG, "Called get instance...");
 		if (instance == null) {
+			Logger.debug(TAG, "Creating new instance...");
 			instance = new BlueKai();
 		}
 		return instance;
@@ -488,7 +495,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private void sendData(Map<String, String> paramsMap) {
 		Logger.debug(TAG, "IsAllowDataPosting --> " + settings.isAllowDataPosting());
-		Logger.debug(TAG, "TC? --> " + paramsMap.containsKey(TC));
 		ParamsList paramsList = new ParamsList();
 		Iterator<String> it = paramsMap.keySet().iterator();
 		while (it.hasNext()) {
@@ -499,7 +505,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			params.setValue(value);
 			paramsList.add(params);
 		}
-		if (settings.isAllowDataPosting() || paramsMap.containsKey(TC)) {
+		if (settings.isAllowDataPosting()) {
 			SendData sendData = new SendData(paramsList, handler, false);
 			Thread thread = new Thread(sendData);
 			thread.start();

@@ -18,7 +18,6 @@ package com.bluekai.sampleapp;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.bluekai.sdk.utils.Logger;
 
@@ -39,7 +38,7 @@ public class DataSourceOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		Log.d("DatasourceOpenHelper", "Creating table with --> " + DEV_SETTINGS_CREATE);
+		Logger.debug("DatasourceOpenHelper", "Creating table with --> " + DEV_SETTINGS_CREATE);
 		db.execSQL(DEV_SETTINGS_CREATE);
 
 	}

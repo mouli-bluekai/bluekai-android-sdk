@@ -18,9 +18,10 @@ package com.bluekai.sdk.utils;
 import android.util.Log;
 
 public class Logger {
-
+	private static boolean debug = false;
+	
 	public static void debug(String tag, String message) {
-		if (Constants.debug) {
+		if (debug) {
 			String fullCName = Thread.currentThread().getStackTrace()[3].getClassName();
 			String cName = fullCName.substring(fullCName.lastIndexOf(".") + 1);
 			String method = Thread.currentThread().getStackTrace()[3].getMethodName();
@@ -31,7 +32,7 @@ public class Logger {
 	}
 
 	public static void info(String tag, String message) {
-		if (Constants.debug) {
+		if (debug) {
 			Log.i(tag, message);
 		}
 	}
@@ -50,6 +51,14 @@ public class Logger {
 
 	public static void error(String tag, String message, Throwable ex) {
 		Log.e(tag, message, ex);
+	}
+
+	public static boolean isDebug() {
+		return debug;
+	}
+
+	public static void setDebug(boolean debug) {
+		Logger.debug = debug;
 	}
 
 }

@@ -19,9 +19,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.bluekai.sdk.model.DevSettings;
+import com.bluekai.sdk.utils.Logger;
 
 public class DataSource {
 	public static final int WRITTABLE_MODE = 1;
@@ -64,7 +64,7 @@ public class DataSource {
 			values.put(DataSourceOpenHelper.DEVSETTINGS_USEHTTPS, devSettings.isUseHttps());
 			database.insert("devsettings", null, values);
 		} catch (Exception ex) {
-			Log.e("DataSource", "Error while creating settings --> ", ex);
+			Logger.error("DataSource", "Error while creating settings --> ", ex);
 		} finally {
 			close();
 		}

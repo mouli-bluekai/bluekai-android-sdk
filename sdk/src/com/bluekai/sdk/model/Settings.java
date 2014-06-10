@@ -18,15 +18,6 @@ package com.bluekai.sdk.model;
 public class Settings {
 
 	private boolean allowDataPosting = true;
-	private boolean firstTime = true;
-
-	public boolean isFirstTime() {
-		return firstTime;
-	}
-
-	public void setFirstTime(boolean firstTime) {
-		this.firstTime = firstTime;
-	}
 
 	public boolean isAllowDataPosting() {
 		return allowDataPosting;
