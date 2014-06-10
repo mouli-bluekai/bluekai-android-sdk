@@ -43,6 +43,7 @@ import com.bluekai.sdk.model.Settings;
 import com.bluekai.sdk.utils.Logger;
 
 public class BlueKai implements SettingsChangedListener, BKViewListener {
+
 	private final static String TAG = "BlueKai";
 	private static BlueKai instance = null;
 
@@ -370,8 +371,20 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * 
 	 * @param map
 	 *            Map with keys and values
+	 * @deprecated as of release v1.0.3. Replaced by {@link #putAll(java.util.Map)}
 	 */
+	@Deprecated
 	public void put(Map<String, String> map) {
+		sendData(map);
+	}
+
+	/**
+	 * Convenience method to send a bunch of key-value pairs to BlueKai
+	 *
+	 * @param map
+	 *            Map with keys and values
+	 */
+	public void putAll(Map<String, String> map) {
 		sendData(map);
 	}
 
