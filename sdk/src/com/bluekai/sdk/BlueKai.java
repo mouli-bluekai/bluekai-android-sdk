@@ -340,7 +340,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 *
 	 * @return listener DataPostedListener
 	 */
-	public DataPostedListener getListener() {
+	public DataPostedListener getDataPostedListener() {
 		return listener;
 	}
 
