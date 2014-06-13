@@ -24,7 +24,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.bluekai.sdk.listeners.SettingsChangedListener;
 import com.bluekai.sdk.model.Params;
@@ -83,7 +82,6 @@ public class BlueKaiDataSource {
 			if (insertId > 0) {
 				Logger.debug(TAG, "listener --> " + listener);
 				if (listener != null) {
-					settings.setFirstTime(false);
 					listener.onSettingsChanged(settings);
 				}
 				return true;
@@ -103,7 +101,6 @@ public class BlueKaiDataSource {
 		Cursor cursor = database.query("settings", null, null, null, null, null, null);
 		Settings settings = new Settings();
 		if (cursor.getCount() > 0) {
-			settings.setFirstTime(false);
 			cursor.moveToFirst();
 			while (!cursor.isAfterLast()) {
 				settings.setAllowDataPosting(getBoolean(cursor, BlueKaiOpenHelper.SETTINGS_DATA_POST));
@@ -190,7 +187,7 @@ public class BlueKaiDataSource {
 	public synchronized void clearParams(ParamsList paramsList) {
 		open(WRITTABLE_MODE);
 		String whereClause = paramsList.getWhereClause();
-		Log.d("DataSource", "clearParams() Where Clause --> " + whereClause);
+		Logger.debug("DataSource", "clearParams() Where Clause --> " + whereClause);
 		database.execSQL("delete from params" + whereClause);
 		close();
 	}

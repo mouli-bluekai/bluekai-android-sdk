@@ -19,6 +19,7 @@ public class DevSettings {
 
 	private String bkurl;
 	private boolean devMode;
+	private boolean httpsEnabled;
 
 	public boolean isDevMode() {
 		return devMode;
@@ -26,6 +27,14 @@ public class DevSettings {
 
 	public void setDevMode(boolean devMode) {
 		this.devMode = devMode;
+	}
+
+	public boolean isHttpsEnabled() {
+		return httpsEnabled;
+	}
+
+	public void setHttpsEnabled(boolean httpsEnabled) {
+		this.httpsEnabled = httpsEnabled;
 	}
 
 	public void setBkurl(String bkurl) {

@@ -37,14 +37,18 @@ public class SettingsLayout extends RelativeLayout {
 	private TextView termsCheck;
 
 	public SettingsLayout(Context context) {
+		this(context, Color.BLACK);
+	}
+
+	public SettingsLayout(Context context, int backgroundColor) {
 		super(context);
 		dataSource = BlueKaiDataSource.getInstance(context);
 		Settings settings = dataSource.getSettings();
-		initView(context, settings);
+		initView(context, settings, backgroundColor);
 	}
 
-	private void initView(Context context, Settings settings) {
-		setBackgroundColor(Color.BLACK);
+	private void initView(Context context, Settings settings, int backgroundColor) {
+		setBackgroundColor(backgroundColor);
 		if (settings == null) {
 			settings = dataSource.getSettings();
 		}

@@ -19,9 +19,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.bluekai.sdk.model.DevSettings;
+import com.bluekai.sdk.utils.Logger;
 
 public class DataSource {
 	public static final int WRITTABLE_MODE = 1;
@@ -61,9 +61,10 @@ public class DataSource {
 			ContentValues values = new ContentValues();
 			values.put(DataSourceOpenHelper.DEVSETTINGS_BKURL, devSettings.getBkurl());
 			values.put(DataSourceOpenHelper.DEVSETTINGS_DEVMODE, devSettings.isDevMode());
+			values.put(DataSourceOpenHelper.DEVSETTINGS_USEHTTPS, devSettings.isHttpsEnabled());
 			database.insert("devsettings", null, values);
 		} catch (Exception ex) {
-			Log.e("DataSource", "Error while creating settings --> ", ex);
+			Logger.error("DataSource", "Error while creating settings --> ", ex);
 		} finally {
 			close();
 		}
@@ -79,6 +80,7 @@ public class DataSource {
 			while (!cursor.isAfterLast()) {
 				devSettings.setBkurl(cursor.getString(cursor.getColumnIndex(DataSourceOpenHelper.DEVSETTINGS_BKURL)));
 				devSettings.setDevMode(getBoolean(cursor, DataSourceOpenHelper.DEVSETTINGS_DEVMODE));
+				devSettings.setHttpsEnabled(getBoolean(cursor, DataSourceOpenHelper.DEVSETTINGS_USEHTTPS));
 				cursor.moveToNext();
 			}
 		}

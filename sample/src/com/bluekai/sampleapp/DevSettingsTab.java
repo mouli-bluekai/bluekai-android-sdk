@@ -48,6 +48,7 @@ public class DevSettingsTab extends Activity {
 
 		String siteId = "2";
 		boolean devMode = false;
+		boolean useHttps = false;
 
 		database = DataSource.getInstance(context);
 		DevSettings devSettings = database.getDevSettings();
@@ -59,18 +60,23 @@ public class DevSettingsTab extends Activity {
 				properties = new Properties();
 				properties.load(inputStream);
 				devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
+				useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
 				siteId = properties.getProperty("siteid");
-				Log.d("BlueKaiSampleApp", "DevSettings tab. DevMode ---> " + devMode + " -- Site ID --> " + siteId);
+				Log.d("BlueKaiSampleApp", "DevSettings tab. DevMode ---> " + devMode + " -- Site ID --> " + siteId + " -- Use Https --> " + useHttps);
 			} catch (IOException e) {
 				Log.e("BlueKaiSampleApp", "Error loading properties. Default values will be loaded from SDK", e);
 			}
 		} else {
 			siteId = devSettings.getBkurl();
 			devMode = devSettings.isDevMode();
+			useHttps = devSettings.isHttpsEnabled();
 		}
 
 		final CheckBox devModeCheck = (CheckBox) findViewById(R.id.devmode);
 		devModeCheck.setChecked(devMode);
+
+		final CheckBox useHttpsCheck = (CheckBox) findViewById(R.id.useHttps);
+		useHttpsCheck.setChecked(useHttps);
 
 		final EditText bkUrlText = (EditText) findViewById(R.id.serverurl);
 		bkUrlText.setText(siteId);
@@ -82,6 +88,7 @@ public class DevSettingsTab extends Activity {
 				DevSettings devSettings = new DevSettings();
 				devSettings.setDevMode(devModeCheck.isChecked());
 				devSettings.setBkurl(bkUrlText.getText().toString());
+				devSettings.setHttpsEnabled(useHttpsCheck.isChecked());
 				database.writeDevSettings(devSettings);
 			}
 		});

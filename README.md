@@ -122,7 +122,7 @@ it is created in `onCreate()` method of `MainActivity`
 
 
 ```java
-BlueKai bk = BlueKai.getInstance(activity, context, devMode, siteId, appVersion, listener, handler);
+BlueKai bk = BlueKai.getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
 ```
 
 The `getInstance()` method accepts the following params:
@@ -130,6 +130,7 @@ The `getInstance()` method accepts the following params:
 * Activity activity
 * Context appContext
 * Boolean devMode
+* Boolean httpsEnabled
 * String siteId
 * String version. This value can be “[app name]-[app version]”
 * BKViewListener listener
@@ -147,7 +148,7 @@ Create a `Map<String, String>` and populate the map with key and
 values. Pass the map to BlueKai using
 
 ```java
-bk.put(map);
+bk.putAll(map);
 ```
 
 ### Resuming data post
@@ -183,20 +184,32 @@ public void onDataPosted(boolean success, String message){
 Return | Method | Description
 --- | --- | ---
 static BlueKai | getInstance() |Convenience method to initialize and get instance of BlueKai without arguments.
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance
-void | put(Map map) |Convenience method to send a bunch of key-value pairs to BlueKai
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. httpsEnabled flag will default to false.
+void | putAll(Map map) |Convenience method to send a bunch of key-value pairs to BlueKai
 void | put(String key, String value) |Method to send data to BlueKai. Accepts a single key-value pair
 void | resume() |Method to resume BlueKai process after calling application resumes. To use in onResume() of the calling activity
 void | setActivity(Activity activity) |Set the calling activity reference
+Activity | getActivity() | Get calling activity reference
 void | setAppContext(Context context) |Set the calling application context
+Context | getContext() | Get the calling application context
 void | setAppVersion(String appVersion) |Set the calling application's version
+String | getAppVersion() | Get calling application's version
 void | setDataPostedListener(DataPostedListener listener) |Set the DataPostedListener to get notifications about status of a data posting. Calling activity should implement this interface
+DataPostedListener | getDataPostedListener() | Get the configured DataPostedListener
 void | setDevMode(boolean devMode) |Set developer mode (True or False)
-void | setFragmentManager(FragmentManager fm) |Set the fragment manager from calling FragmentActivity. Used when devMode is enabled to show webview in a popup dialog. Calling activity should be FragmentActivity
-void | setOptIn(boolean optin) |Method to set user opt-in or opt-out preference
+boolean | isDevMode() | Get developer mode
+void | setHttpsEnabled(boolean httpsEnabled) |Set https enabled (True or False)
+boolean | isHttpsEnabled() | Get httpsEnabled flag
+void | setOptIn(boolean optin) |Method to set user opt-in or opt-out preference. *Deprecated* in favor of setOptInPreference method
+void | setOptInPreference(boolean optin) |Method to set user opt-in or opt-out preference
+boolean | getOptInPreference() | Method to get user opt-in or opt-out preference  
 void | setSiteId(String siteId) |Set BlueKai site id
+String | getSiteId() | Get BlueKai site id
 void | setHandler(Handler handler) |Set Handler to get data posting updates
+Handler | getHandler() | Get Handler configured to get data posting updates
 void | showSettingsScreen(SettingsChangedListener listener) |Method to show BlueKai in-built opt-in screen. Requires `<activity android:name="com.bluekai.sdk.SettingsActivity" />` in AndroidManifest.xml to be present
+void | setFragmentManager(FragmentManager fm) |Set the fragment manager from calling FragmentActivity. Used when devMode is enabled to show webview in a popup dialog. Calling activity should be FragmentActivity
 
 # Sample Application 
 

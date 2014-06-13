@@ -18,7 +18,6 @@ package com.bluekai.sampleapp;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.bluekai.sdk.utils.Logger;
 
@@ -28,9 +27,10 @@ public class DataSourceOpenHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 	public static final String DEVSETTINGS_BKURL = "bkurl";
 	public static final String DEVSETTINGS_DEVMODE = "devmode";
+	public static final String DEVSETTINGS_USEHTTPS = "useHttps";
 
 	private final String DEV_SETTINGS_CREATE = "create table devsettings (_id integer primary key autoincrement, "
-			+ DEVSETTINGS_BKURL + " text, " + DEVSETTINGS_DEVMODE + " boolean)";
+			+ DEVSETTINGS_BKURL + " text, " + DEVSETTINGS_DEVMODE + " boolean, " + DEVSETTINGS_USEHTTPS + " boolean);";
 
 	public DataSourceOpenHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,7 +38,7 @@ public class DataSourceOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		Log.d("DatasourceOpenHelper", "Creating table with --> " + DEV_SETTINGS_CREATE);
+		Logger.debug("DatasourceOpenHelper", "Creating table with --> " + DEV_SETTINGS_CREATE);
 		db.execSQL(DEV_SETTINGS_CREATE);
 
 	}
