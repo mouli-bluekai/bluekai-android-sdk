@@ -185,11 +185,11 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 *
 	 * @return BlueKai instance
 	 */
-    public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,
+	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,
                                       String appVersion, DataPostedListener listener, Handler handler) {
-        Logger.debug(TAG, "Called get instance...");
+    	Logger.debug(TAG, "Called get instance...");
         if (instance == null) {
-            instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
+        	instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
         } else {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
