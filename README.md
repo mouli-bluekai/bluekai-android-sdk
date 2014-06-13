@@ -122,7 +122,7 @@ it is created in `onCreate()` method of `MainActivity`
 
 
 ```java
-BlueKai bk = BlueKai.getInstance(activity, context, devMode, useHttps, siteId, appVersion, listener, handler);
+BlueKai bk = BlueKai.getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
 ```
 
 The `getInstance()` method accepts the following params:
@@ -130,7 +130,7 @@ The `getInstance()` method accepts the following params:
 * Activity activity
 * Context appContext
 * Boolean devMode
-* Boolean useHttps
+* Boolean httpsEnabled
 * String siteId
 * String version. This value can be “[app name]-[app version]”
 * BKViewListener listener
@@ -184,8 +184,8 @@ public void onDataPosted(boolean success, String message){
 Return | Method | Description
 --- | --- | ---
 static BlueKai | getInstance() |Convenience method to initialize and get instance of BlueKai without arguments.
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. useHttps flag will default to false.
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. httpsEnabled flag will default to false.
 void | putAll(Map map) |Convenience method to send a bunch of key-value pairs to BlueKai
 void | put(String key, String value) |Method to send data to BlueKai. Accepts a single key-value pair
 void | resume() |Method to resume BlueKai process after calling application resumes. To use in onResume() of the calling activity
@@ -199,8 +199,8 @@ void | setDataPostedListener(DataPostedListener listener) |Set the DataPostedLis
 DataPostedListener | getDataPostedListener() | Get the configured DataPostedListener
 void | setDevMode(boolean devMode) |Set developer mode (True or False)
 boolean | isDevMode() | Get developer mode
-void | setuseHttps(boolean useHttps) |Set use https (True or False)
-boolean | isUseHttps() | Get useHttps flag
+void | setHttpsEnabled(boolean httpsEnabled) |Set https enabled (True or False)
+boolean | isHttpsEnabled() | Get httpsEnabled flag
 void | setOptIn(boolean optin) |Method to set user opt-in or opt-out preference. *Deprecated* in favor of setOptInPreference method
 void | setOptInPreference(boolean optin) |Method to set user opt-in or opt-out preference
 boolean | getOptInPreference() | Method to get user opt-in or opt-out preference  

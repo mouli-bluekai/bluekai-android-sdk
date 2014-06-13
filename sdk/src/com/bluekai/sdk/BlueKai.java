@@ -50,7 +50,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private boolean devMode = false;
 	private Activity activity = null;
 	private Context context = null;
-	private boolean useHttps = false;
+	private boolean httpsEnabled = false;
 	private final String HTTP = "http://";
 	private final String HTTPS = "https://";
 	private final String BASE_URL = "mobileproxy.bluekai.com/m.html";
@@ -74,7 +74,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private BlueKai(Activity activity, Context context, boolean devMode, String siteId, String appVersion,
                     DataPostedListener listener, Handler handler) {
 		this(activity, context, devMode, false, siteId, appVersion, listener, handler);
-    }
+	}
 
 	private BlueKai(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId, String appVersion,
 			DataPostedListener listener, Handler handler) {
@@ -89,7 +89,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		}
 		this.listener = listener;
 		this.handler = handler;
-		this.useHttps = useHttps;
+		this.httpsEnabled = useHttps;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
 		Logger.debug(TAG, " onCreate BK URL --> " + (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL));
 		database = BlueKaiDataSource.getInstance(context);
@@ -171,7 +171,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * @param devMode
 	 *          Developer mode. Set to enable webview to popup in a dialog.
 	 *          Strictly for developer purposes only
-	 * @param useHttps
+	 * @param httpsEnabled
 	 *          Secure mode. Set to enable data transfer to BlueKai over https.
 	 * @param siteId
 	 *          BlueKai site id
@@ -185,17 +185,17 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 *
 	 * @return BlueKai instance
 	 */
-    public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId,
+    public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,
                                       String appVersion, DataPostedListener listener, Handler handler) {
         Logger.debug(TAG, "Called get instance...");
         if (instance == null) {
-            instance = new BlueKai(activity, context, devMode, useHttps, siteId, appVersion, listener, handler);
+            instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
         } else {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
 			instance.setDevMode(devMode);
 			Logger.setDebug(devMode);
-			instance.setUseHttps(useHttps);
+			instance.setHttpsEnabled(httpsEnabled);
 			instance.setSiteId(siteId);
 			instance.setAppVersion(appVersion);
 			instance.setDataPostedListener(listener);
@@ -229,7 +229,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public void setActivity(Activity activity) {
 		this.activity = activity;
-		instance.activity = activity;
 	}
 
 	/**
@@ -251,7 +250,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		database = BlueKaiDataSource.getInstance(context);
 		database.setSettingsChangedListener(this);
 		settings = database.getSettings();
-		instance.context = context;
 	}
 
 	/**
@@ -271,7 +269,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public void setDevMode(boolean devMode) {
 		this.devMode = devMode;
-		instance.devMode = devMode;
 	}
 
 	/**
@@ -290,7 +287,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public void setSiteId(String siteId) {
 		this.siteId = siteId;
-		instance.siteId = siteId;
 	}
 
 	/**
@@ -310,7 +306,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public void setAppVersion(String appVersion) {
 		this.appVersion = appVersion;
-		instance.appVersion = appVersion;
 	}
 
 	/**
@@ -331,7 +326,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public void setDataPostedListener(DataPostedListener listener) {
 		this.listener = listener;
-		instance.listener = listener;
 	}
 
 	/**
@@ -346,7 +340,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	public void setHandler(Handler handler) {
 		this.handler = handler;
-		instance.handler = handler;
 	}
 
 	public Handler getHandler() {
@@ -440,20 +433,20 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * Method to check if useHttps is enabled. If useHttps is set then data is sent to BlueKai over https
+	 * Method to check if httpsEnabled is true. If httpsEnabled is set then data is sent to BlueKai over https
 	 *
-	 * @return useHttps flag that enables/disables data being sent to BlueKai over https.
+	 * @return httpsEnabled flag that enables/disables data being sent to BlueKai over https.
 	 */
-	public boolean isUseHttps() {
-		return useHttps;
+	public boolean isHttpsEnabled() {
+		return httpsEnabled;
 	}
 
 	/**
-	 * Method to change useHttps settings. If useHttps is set then data is sent to BlueKai over https
-	 * @param useHttps
+	 * Method to change httpsEnabled settings. If httpsEnabled is set then data is sent to BlueKai over https
+	 * @param httpsEnabled
 	 */
-	public void setUseHttps(boolean useHttps) {
-		this.useHttps = useHttps;
+	public void setHttpsEnabled(boolean httpsEnabled) {
+		this.httpsEnabled = httpsEnabled;
 	}
 
 
@@ -582,7 +575,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		private String getURL() throws UnsupportedEncodingException {
 			StringBuffer buffer = null;
-			String url = (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL) + "?site=" + getSiteId() + "&";
+			String url = (httpsEnabled ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL) + "?site=" + getSiteId() + "&";
 			String queryPart = "";
 			Iterator<Params> it = paramsList.iterator();
 			buffer = new StringBuffer();

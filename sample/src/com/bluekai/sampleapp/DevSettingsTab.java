@@ -69,7 +69,7 @@ public class DevSettingsTab extends Activity {
 		} else {
 			siteId = devSettings.getBkurl();
 			devMode = devSettings.isDevMode();
-			useHttps = devSettings.isUseHttps();
+			useHttps = devSettings.isHttpsEnabled();
 		}
 
 		final CheckBox devModeCheck = (CheckBox) findViewById(R.id.devmode);
@@ -88,7 +88,7 @@ public class DevSettingsTab extends Activity {
 				DevSettings devSettings = new DevSettings();
 				devSettings.setDevMode(devModeCheck.isChecked());
 				devSettings.setBkurl(bkUrlText.getText().toString());
-				devSettings.setUseHttps(useHttpsCheck.isChecked());
+				devSettings.setHttpsEnabled(useHttpsCheck.isChecked());
 				database.writeDevSettings(devSettings);
 			}
 		});

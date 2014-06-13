@@ -80,7 +80,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 			} else {
 				siteId = devSettings.getBkurl();
 				devMode = devSettings.isDevMode();
-				useHttps = devSettings.isUseHttps();
+				useHttps = devSettings.isHttpsEnabled();
 			}
 
 			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
@@ -145,7 +145,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 		} else {
 			siteId = devSettings.getBkurl();
 			devMode = devSettings.isDevMode();
-			useHttps = devSettings.isUseHttps();
+			useHttps = devSettings.isHttpsEnabled();
 		}
 		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId + " -- Use Https --> " + useHttps);
 		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
