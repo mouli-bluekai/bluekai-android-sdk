@@ -512,6 +512,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			paramsList.add(params);
 		}
 		if (settings.isAllowDataPosting()) {
+			if(blueKaiView == null) {
+				addBlueKaiWebView(context);
+			}
 			SendData sendData = new SendData(paramsList, handler, false);
 			Thread thread = new Thread(sendData);
 			thread.start();
