@@ -149,6 +149,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 		}
 		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId + " -- Use Https --> " + useHttps);
 		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
+		bk.resume();
 	}
 
 	@Override
