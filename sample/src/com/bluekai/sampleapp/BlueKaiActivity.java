@@ -31,18 +31,17 @@ public class BlueKaiActivity extends TabActivity {
 
 		TabHost tabHost = getTabHost();
 		TabHost.TabSpec spec;
-		
+
 		Intent intent = new Intent().setClass(this, BlueKaiTab.class);
 		spec = tabHost.newTabSpec("bluekai").setIndicator("BlueKai").setContent(intent);
 		tabHost.addTab(spec);
 
-		spec = tabHost.newTabSpec("settings").setIndicator("T&C")
-				.setContent(new Intent().setClass(this, SettingsActivity.class));
+		spec = tabHost.newTabSpec("settings").setIndicator("T&C").setContent(new Intent().setClass(this, SettingsActivity.class));
 		tabHost.addTab(spec);
 
-		intent = new Intent().setClass(this, DevSettingsTab.class);
-		spec = tabHost.newTabSpec("devsettings").setIndicator("Settings")
-				.setContent(intent);
+		intent = new Intent().setClass(this, SamplePreferencesActivity.class);
+		spec = tabHost.newTabSpec("devsettings").setIndicator("Settings").setContent(intent);
 		tabHost.addTab(spec);
 	}
+
 }
