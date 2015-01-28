@@ -42,15 +42,10 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 
 	private EditText valueText = null;
 
-<<<<<<< HEAD
-	private boolean devMode = false;
-	private boolean useHttps = false;
-=======
 	// private EditText pairsCountText = null;
 
 	private Boolean devMode = false;
 
->>>>>>> df0d9fe... Refactored code to use SharedPreferences instead of SQLite DB in the Sample App
 	private String siteId = null;
 
 	private String appVersion = "4.1.6";
@@ -63,42 +58,19 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 
 	private String customUserAgent;
 
+	private boolean useHttps;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_blue_kai);
-<<<<<<< HEAD
-			this.context = getApplicationContext();
-
-			database = DataSource.getInstance(context);
-			DevSettings devSettings = database.getDevSettings();
-			if (devSettings == null) {
-				try {
-					Resources resources = this.getResources();
-					AssetManager assetManager = resources.getAssets();
-					InputStream inputStream = assetManager.open("settings.properties");
-					Properties properties = new Properties();
-					properties.load(inputStream);
-					devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
-					useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
-					siteId = properties.getProperty("siteid");
-				} catch (IOException e) {
-					Log.e("BlueKaiSampleApp", "Error loading properties. Default values will be loaded from SDK", e);
-				}
-			} else {
-				siteId = devSettings.getBkurl();
-				devMode = devSettings.isDevMode();
-				useHttps = devSettings.isHttpsEnabled();
-			}
-=======
 
 			readPreferences();
 			preferences.registerOnSharedPreferenceChangeListener(this);
 
 			siteId = preferences.getString("siteId", "2");
 			devMode = preferences.getBoolean("enableDevMode", false);
->>>>>>> df0d9fe... Refactored code to use SharedPreferences instead of SQLite DB in the Sample App
 
 			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
 			bk.setFragmentManager(getSupportFragmentManager());
@@ -136,8 +108,6 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 					}
 				}
 			});
-<<<<<<< HEAD
-=======
 
 			/*
 			 * pushButton = (Button) findViewById(R.id.push);
@@ -152,7 +122,6 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 			 * count; i++) { paramsMap.put("test" + i, "value" + i); }
 			 * bk.put(paramsMap); } } });
 			 */
->>>>>>> df0d9fe... Refactored code to use SharedPreferences instead of SQLite DB in the Sample App
 		} catch (Exception ex) {
 			Log.e("BlueKaiTab", "Error while creating", ex);
 		}
@@ -161,33 +130,9 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 	@Override
 	protected void onResume() {
 		super.onResume();
-<<<<<<< HEAD
-		database = DataSource.getInstance(context);
-		DevSettings devSettings = database.getDevSettings();
-		if (devSettings == null) {
-			try {
-				Resources resources = this.getResources();
-				AssetManager assetManager = resources.getAssets();
-				InputStream inputStream = assetManager.open("settings.properties");
-				Properties properties = new Properties();
-				properties.load(inputStream);
-				useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
-				devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
-				siteId = properties.getProperty("siteid");
-			} catch (IOException e) {
-				Log.e("BlueKaiSampleApp", "Error loading properties. Default values will be loaded from SDK", e);
-			}
-		} else {
-			siteId = devSettings.getBkurl();
-			devMode = devSettings.isDevMode();
-			useHttps = devSettings.isHttpsEnabled();
-		}
-		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId + " -- Use Https --> " + useHttps);
-		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
-=======
+
 		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId);
 		bk = BlueKai.getInstance(this, this, devMode, siteId, appVersion, this, new Handler());
->>>>>>> df0d9fe... Refactored code to use SharedPreferences instead of SQLite DB in the Sample App
 		bk.resume();
 	}
 
