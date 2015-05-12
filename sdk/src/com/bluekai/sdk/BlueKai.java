@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
@@ -121,7 +120,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.activity = activity;
 		this.context = context;
 		this.devMode = devMode;
-		Logger.setDebug(devMode);
 		this.appVersion = appVersion;
 		if (!TextUtils.isEmpty(siteId) && !this.siteId.equals(siteId)) {
 			this.siteId = siteId;
@@ -156,7 +154,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public void resume() {
 		Logger.debug(TAG, " resume Dev Mode ? " + devMode);
-		if (!devMode && useWebView) {
+		if (!devMode && useWebView && blueKaiView == null) {
 			addBlueKaiWebView(context);
 		}
 
@@ -199,7 +197,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
 			instance.setDevMode(devMode);
-			Logger.setDebug(devMode);
 			instance.setSiteId(siteId);
 			instance.setAppVersion(appVersion);
 			instance.setDataPostedListener(listener);
@@ -262,7 +259,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
 			instance.setDevMode(devMode);
-			Logger.setDebug(devMode);
 			instance.setHttpsEnabled(httpsEnabled);
 			instance.setSiteId(siteId);
 			instance.setAppVersion(appVersion);
@@ -725,8 +721,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		CoreTagProcessor coreTagProcessor = new CoreTagProcessor(config, paramsList);
 		final String tagUrl = coreTagProcessor.getUrl();
 		Logger.debug(TAG, "URL: " + tagUrl);
-		// Toast.makeText(activity, "URL: " + tagUrl,
-		// Toast.LENGTH_SHORT).show();
 		BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
 
 			@Override
@@ -783,14 +777,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		public void run() {
 			try {
 				final String url = getURL();
-				Handler handler = new Handler(Looper.getMainLooper());
-				handler.post(new Runnable() {
-					@Override
-					public void run() {
-						// Toast.makeText(activity, "URL: " + url,
-						// Toast.LENGTH_SHORT).show();
-					}
-				});
 				Logger.debug(TAG, "URL to call ---> " + url);
 				if (url != null && !url.trim().equals("")) {
 					try {
@@ -832,6 +818,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			Iterator<Params> it = paramsList.iterator();
 			buffer = new StringBuffer();
 			String tailString = "&appVersion=" + appVersion;
+			if(!optOutPrivacy){
+				tailString = tailString+ "&adid=" + advertisingId;
+			}
 			int tailLength = tailString.length();
 			while (it.hasNext()) {
 				Params params = it.next();
