@@ -951,6 +951,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	private void populateAdvertisingId() {
+		advertisingIdRetrieved = false;
 		GetAdvertisingIdTask task = new GetAdvertisingIdTask(context, new BKAdvertisingIdListener() {
 
 			@Override
