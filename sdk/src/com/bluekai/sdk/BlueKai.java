@@ -661,12 +661,11 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		CoreTagProcessor coreTagProcessor = new CoreTagProcessor(config, paramsList);
 		final String tagUrl = coreTagProcessor.getUrl();
-		Logger.debug(TAG, "URL: " + tagUrl);
 		BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
 
 			@Override
 			public void beforeSendingRequest() {
-				Logger.debug(TAG, "Sending request to: " + tagUrl);
+				Logger.debug(TAG, "URL: " + tagUrl);
 			}
 
 			@Override
@@ -720,12 +719,11 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		CoreTagProcessor coreTagProcessor = new CoreTagProcessor(config, paramsList);
 		final String tagUrl = coreTagProcessor.getUrl();
-		Logger.debug(TAG, "URL: " + tagUrl);
 		BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
 
 			@Override
 			public void beforeSendingRequest() {
-				Logger.debug(TAG, "Sending request to: " + tagUrl);
+				Logger.debug(TAG, "URL: " + tagUrl);
 			}
 
 			@Override
