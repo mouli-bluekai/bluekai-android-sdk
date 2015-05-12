@@ -18,11 +18,15 @@
         android:key="useWebView"
         android:summary="Check this to use web view to make requests to tags API"
         android:title="Use WebView" />
-
-    <EditTextPreference
-        android:defaultValue=""
-        android:key="customUserAgent"
-        android:summary="User Agent to be used for making requests to tags API if not using web view"
-        android:title="Custom User Agent" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="useHttps"
+        android:summary="Check this to use HTTPS for making calls"
+        android:title="Use HTTPS" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="sync"
+        android:summary="Check this to make synchronous calls"
+        android:title="Make Synced calls" />
 
 </PreferenceScreen>

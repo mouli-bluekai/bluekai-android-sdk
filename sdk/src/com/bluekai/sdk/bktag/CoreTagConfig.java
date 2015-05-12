@@ -1,8 +1,9 @@
 package com.bluekai.sdk.bktag;
 
-
-public class Config {
+public class CoreTagConfig {
 	private String site;
+
+	private String appVersion;
 
 	private String limit;
 
@@ -19,6 +20,10 @@ public class Config {
 	private Object timeOut;
 
 	private Boolean ignoreOutsideIframe;
+
+	private Boolean https = false;
+
+	private String advertisingId;
 
 	public String getSite() {
 		return site;
@@ -90,6 +95,34 @@ public class Config {
 
 	public void setIgnoreOutsideIframe(Boolean ignoreOutsideIframe) {
 		this.ignoreOutsideIframe = ignoreOutsideIframe;
+	}
+
+	public Boolean isHttps() {
+		return https;
+	}
+
+	public void setHttps(Boolean https) {
+		this.https = https;
+	}
+
+	public String getAppVersion() {
+		return appVersion;
+	}
+
+	public void setAppVersion(String appVersion) {
+		this.appVersion = appVersion;
+	}
+
+	public Boolean getHttps() {
+		return https;
+	}
+
+	public String getAdvertisingId() {
+		return advertisingId;
+	}
+
+	public void setAdvertisingId(String advertisingId) {
+		this.advertisingId = advertisingId;
 	}
 
 }

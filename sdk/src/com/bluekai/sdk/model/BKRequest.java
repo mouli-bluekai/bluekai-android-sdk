@@ -18,6 +18,8 @@ public class BKRequest {
 	// The content type in case of a POST request
 	private String contentType;
 
+	private String userAgent;
+
 	public Type getType() {
 		return type;
 	}
@@ -49,4 +51,13 @@ public class BKRequest {
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
+
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
+	}
+
 }

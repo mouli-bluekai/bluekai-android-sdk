@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bluekai.sdk.model.Params;
+import com.bluekai.sdk.model.ParamsList;
+
 public class CoreTagProcessor {
 
 	public static final Map<String, String> configMapKeys = new HashMap<String, String>();
@@ -50,30 +53,82 @@ public class CoreTagProcessor {
 
 	private List<String> params;
 
-	private Config config;
+	private CoreTagConfig config;
 
-	public CoreTagProcessor(Config configuration) {
+	private ParamsList inputParameters;
+
+	private static final String PIXEL_URL = "http://tags.bluekai.com/";
+
+	private static final String PIXEL_URL_SECURE = "https://stags.bluekai.com/";
+
+	public CoreTagProcessor(CoreTagConfig configuration, ParamsList parameters) {
 		params = new ArrayList<String>();
 		this.config = configuration;
+		this.inputParameters = parameters;
+		this.process();
 	}
 
-	public void process() {
-		//
+	private void process() {
+
+		addParam("ret", "json", null);
+
+		for (Params params : inputParameters) {
+			addParam("phint", params.getKey(), params.getValue());
+		}
+
+		addParam("phint", "appVersion", config.getAppVersion());
+
+		int bkrid = (int) Math.floor(Math.random() * Math.pow(2, 31));
+		addParam("bkrid", String.valueOf(bkrid), null);
+
+		int r = (int) (Math.random() * 9999999);
+		addParam("r", String.valueOf(r), null);
+
+		if (config.getAdvertisingId() != null) addParam("adid", config.getAdvertisingId(), null);
+
+	}
+
+	/**
+	 * Returns the URL after the processing
+	 * 
+	 * @return
+	 */
+	public String getUrl() {
+		StringBuilder url = new StringBuilder();
+
+		if (config.isHttps()) {
+			url.append(PIXEL_URL_SECURE);
+		} else {
+			url.append(PIXEL_URL);
+		}
+		if (config.getSite() != null) {
+			url.append("site/").append(config.getSite());
+		}
+		url = url.append("?");
+
+		for (String parameter : params) {
+			url = url.append(parameter).append("&");
+		}
+
+		url = url.deleteCharAt(url.length() - 1);
+
+		return url.toString();
 
 	}
 
 	private void addParam(String type, String key, String value) {
 		if (type != null) {
-			if (value != null) {
-				try {
+			try {
+				if (value != null) {
 					params.add(type + "=" + URLEncoder.encode(key + "=" + value, "UTF-8"));
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+				} else {
+					params.add(type + "=" + URLEncoder.encode(key, "UTF-8"));
 				}
-			} else {
-				params.add(type + "=" + key);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
 			}
+
 		}
 	}
 
@@ -82,7 +137,6 @@ public class CoreTagProcessor {
 	}
 
 	private void addHash(String key1, String key2, String value) {
-		// TODO hashing function
 		String md5Hash = value == null || value.equals("") ? "" : CoreTagUtil.hashString(value, "MD5");
 		String sha256Hash = value == null || value.equals("") ? "" : CoreTagUtil.hashString(value, "SHA-256");
 		this.addParam("phint", key1, md5Hash);

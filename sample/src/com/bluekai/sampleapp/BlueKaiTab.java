@@ -54,11 +54,11 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 
 	protected SharedPreferences preferences;
 
-	private Boolean useWebView;
+	private Boolean useWebView = false;
 
-	private String customUserAgent;
+	private boolean useHttps = false;
 
-	private boolean useHttps;
+	private boolean sync = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -71,8 +71,11 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 
 			siteId = preferences.getString("siteId", "2");
 			devMode = preferences.getBoolean("enableDevMode", false);
+			useWebView = preferences.getBoolean("useWebView", false);
+			useHttps = preferences.getBoolean("useHttps", false);
+			sync = preferences.getBoolean("sync", false);
 
-			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
+			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 			bk.setFragmentManager(getSupportFragmentManager());
 
 			keyText = (EditText) findViewById(R.id.keyText);
@@ -104,24 +107,17 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 						valueText.requestFocus();
 						Toast.makeText(BlueKaiTab.this, "Value is empty. Please enter a value", Toast.LENGTH_LONG).show();
 					} else {
-						bk.put(key, value);
+						if (sync) {
+							String response = bk.putSync(key, value);
+							Toast.makeText(BlueKaiTab.this, response, Toast.LENGTH_SHORT).show();
+						} else {
+							bk.put(key, value);
+						}
+
 					}
 				}
 			});
 
-			/*
-			 * pushButton = (Button) findViewById(R.id.push);
-			 * pushButton.setOnClickListener(new OnClickListener() {
-			 * 
-			 * @Override public void onClick(View arg0) { int count =
-			 * Integer.parseInt(pairsCountText.getText().toString()); if (count
-			 * < 1 || count > 2000) { Toast.makeText(context,
-			 * "Out of range. Enter a number between 1 and 2000",
-			 * Toast.LENGTH_LONG) .show(); } else { Map<String, String>
-			 * paramsMap = new HashMap<String, String>(); for (int i = 0; i <
-			 * count; i++) { paramsMap.put("test" + i, "value" + i); }
-			 * bk.put(paramsMap); } } });
-			 */
 		} catch (Exception ex) {
 			Log.e("BlueKaiTab", "Error while creating", ex);
 		}
@@ -132,13 +128,14 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 		super.onResume();
 
 		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId);
-		bk = BlueKai.getInstance(this, this, devMode, siteId, appVersion, this, new Handler());
+		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 		bk.resume();
 	}
 
 	@Override
 	public void onDataPosted(boolean success, String message) {
 		Log.d("BlueKaiSampleApp", String.valueOf(success) + " :: " + message);
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -152,9 +149,12 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 		} else if (key.equals("useWebView")) {
 			Boolean oldUseWebView = useWebView;
 			useWebView = sharedPreferences.getBoolean(key, oldUseWebView);
-		} else if (key.equals("customUserAgent")) {
-			String oldUserAgent = customUserAgent;
-			customUserAgent = sharedPreferences.getString(key, oldUserAgent);
+		} else if (key.equals("useHttps")) {
+			Boolean oldUseHttps = useHttps;
+			useHttps = sharedPreferences.getBoolean(key, oldUseHttps);
+		} else if (key.equals("sync")) {
+			Boolean oldSync = sync;
+			sync = sharedPreferences.getBoolean(key, oldSync);
 		}
 
 	}

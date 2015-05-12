@@ -11,10 +11,10 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
+import android.os.AsyncTask;
+
 import com.bluekai.sdk.model.BKRequest;
 import com.bluekai.sdk.model.BKResponse;
-
-import android.os.AsyncTask;
 
 public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKResponse> {
 
@@ -40,6 +40,7 @@ public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKRes
 				case POST: {
 					HttpPost post = new HttpPost(url);
 					post.setHeader("Content-type", request.getContentType());
+					post.setHeader("User-Agent", request.getUserAgent());
 					post.setEntity(new StringEntity(request.getPayload(), "UTF-8"));
 					response = client.execute(post, localContext);
 
@@ -52,6 +53,7 @@ public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKRes
 					String urlWithParams = url + ((url.indexOf("?") == -1) ? "?" : "&");
 					urlWithParams = urlWithParams + request.getPayload();
 					HttpGet httpGet = new HttpGet(urlWithParams);
+					httpGet.setHeader("User-Agent", request.getUserAgent());
 					response = client.execute(httpGet);
 
 					break;
