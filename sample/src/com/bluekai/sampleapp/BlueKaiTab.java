@@ -76,7 +76,6 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 			sync = preferences.getBoolean("sync", false);
 
 			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
-			bk.setFragmentManager(getSupportFragmentManager());
 
 			keyText = (EditText) findViewById(R.id.keyText);
 			valueText = (EditText) findViewById(R.id.valueText);

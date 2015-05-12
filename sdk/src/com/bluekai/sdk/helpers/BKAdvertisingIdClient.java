@@ -14,6 +14,12 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.RemoteException;
 
+/**
+ * Class to read Google Advertising ID from Google Play Services
+ * 
+ * @author moulimukherjee
+ *
+ */
 public final class BKAdvertisingIdClient {
 
 	public static final class AdInfo {
@@ -51,8 +57,7 @@ public final class BKAdvertisingIdClient {
 		if (context.getApplicationContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
 
 			try {
-				
-				
+
 				AdvertisingInterface adInterface = new AdvertisingInterface(connection.getBinder());
 				AdInfo adInfo = new AdInfo(adInterface.getId(), adInterface.isLimitAdTrackingEnabled(true));
 				return adInfo;

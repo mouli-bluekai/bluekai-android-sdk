@@ -23,14 +23,18 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
-import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bluekai.sdk.bktag.CoreTagConfig;
 import com.bluekai.sdk.bktag.CoreTagProcessor;
@@ -83,8 +87,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private BlueKaiDataSource database = null;
 
 	private Settings settings;
-
-	private FragmentManager fManager = null;
 
 	private DataPostedListener listener;
 
@@ -140,17 +142,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		database.setSettingsChangedListener(this);
 		settings = database.getSettings();
 		populateAdvertisingId();
-	}
-
-	/**
-	 * Set the fragment manager. Used when devMode is enabled to show webview in
-	 * a popup dialog
-	 * 
-	 * @param fm
-	 *            FragmentManager
-	 */
-	public void setFragmentManager(FragmentManager fm) {
-		this.fManager = fm;
 	}
 
 	/**
@@ -581,9 +572,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			WebSettings webSettings = blueKaiView.getSettings();
 			webSettings.setJavaScriptEnabled(true);
 			int height = 1, width = 1;
-			if (devMode) {
-				height = width = RelativeLayout.LayoutParams.MATCH_PARENT;
-			}
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
 			params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
 			params.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
@@ -728,6 +716,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		CoreTagProcessor coreTagProcessor = new CoreTagProcessor(config, paramsList);
 		final String tagUrl = coreTagProcessor.getUrl();
 		Logger.debug(TAG, "URL: " + tagUrl);
+		if (devMode) {
+			Toast.makeText(context, "URL: " + tagUrl, Toast.LENGTH_LONG).show();
+		}
 
 		BKRequest request = new BKRequest();
 		request.setUrl(tagUrl);
@@ -785,6 +776,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		private ParamsList paramsList = null, backupList = null;
 
+		private Handler handler = null;
+
 		private boolean existingData = false;
 
 		private ParamsList currentList = null;
@@ -792,6 +785,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		public SendData(ParamsList paramsList, Handler handler, boolean existingData) {
 			this.paramsList = paramsList;
 			this.backupList = new ParamsList(paramsList);
+			this.handler = handler;
 			this.existingData = existingData;
 			if (blueKaiView != null) {
 				blueKaiView.setBKViewListerner(this);
@@ -802,7 +796,15 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		public void run() {
 			try {
 				final String url = getURL();
-				Logger.debug(TAG, "URL to call ---> " + url);
+				Logger.debug(TAG, "URL: " + url);
+				if (devMode && handler != null) {
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(context, "URL: " + url, Toast.LENGTH_LONG).show();
+						}
+					});
+				}
 				if (url != null && !url.trim().equals("")) {
 					try {
 						currentList = new ParamsList(backupList.subList(0, backupList.size() - paramsList.size()));
@@ -958,10 +960,25 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private synchronized void showBlueKaiDialog(String url, boolean existingData, ParamsList paramsList, BKViewListener listener) {
 		if (devMode) {
-			BlueKaiViewDialog dialog = new BlueKaiViewDialog();
-			dialog.setLoadURL(url, existingData, paramsList);
-			dialog.setBKViewListener(listener);
-			dialog.show(fManager, "bkdialog");
+			AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+			WebView wv = new BlueKaiWebView(context);
+			wv.setWebViewClient(new WebViewClient() {
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+					view.loadUrl(url);
+					return true;
+				}
+			});
+			wv.getSettings().setJavaScriptEnabled(true);
+			wv.loadUrl(url);
+			alert.setView(wv);
+			alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			});
+			alert.show().getWindow().setLayout(600, 600);;
 		} else {
 			blueKaiView.loadUrl(url, existingData, paramsList);
 		}
