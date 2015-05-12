@@ -90,12 +90,17 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private Handler handler;
 
+	// Flag to determine if calls should be made using web view or if it should
+	// be a direct call
 	private boolean useWebView = false;
 
 	private String userAgent = null;
 
+	// Google Advertising ID
 	private String advertisingId = null;
 
+	// Value for Google Setting to opt out of interest based ads. If this value
+	// is true, then advertising ID won't be sent
 	private boolean optOutPrivacy = false;
 
 	private boolean advertisingIdRetrieved = false;
@@ -429,8 +434,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * Method to send data to BlueKai. This makes a direct call instead of using web view. 
-	 * Accepts a single key-value pair Returns the campaign details
+	 * Method to send data to BlueKai. This makes a direct call instead of using
+	 * web view. Accepts a single key-value pair Returns the campaign details
 	 * 
 	 * @param key
 	 *            Key
@@ -650,40 +655,36 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		}
 	}
 
+	/**
+	 * Makes an async call to tags server using BKWebServiceRequestTask
+	 * 
+	 * @param paramsList
+	 * @param existingData
+	 */
 	private void sendDataWithoutWebView(final ParamsList paramsList, final boolean existingData) {
-		CoreTagConfig config = new CoreTagConfig();
-		config.setSite(siteId);
-		config.setAppVersion(appVersion);
-		config.setHttps(httpsEnabled);
-		if (!optOutPrivacy) {
-			config.setAdvertisingId(advertisingId);
-		}
 
-		CoreTagProcessor coreTagProcessor = new CoreTagProcessor(config, paramsList);
-		final String tagUrl = coreTagProcessor.getUrl();
-		BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
+		BKRequest request = getBkRequestObject(paramsList, existingData);
 
-			@Override
-			public void beforeSendingRequest() {
-				Logger.debug(TAG, "URL: " + tagUrl);
-			}
+		// Not making the actual call if dev mode is on
+		if (!devMode) {
+			BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
 
-			@Override
-			public void afterReceivingResponse(BKResponse response) {
-				Logger.debug(TAG, "Received response: " + response.getResponseBody());
-				if (response.isError()) {
-					onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
-				} else {
-					onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
+				@Override
+				public void beforeSendingRequest() {
 				}
-			}
-		});
-		BKRequest request = new BKRequest();
-		request.setUrl(tagUrl);
-		request.setUserAgent(userAgent);
-		request.setContentType("application/json");
-		request.setType(Type.GET);
-		webServiceTask.execute(request);
+
+				@Override
+				public void afterReceivingResponse(BKResponse response) {
+					Logger.debug(TAG, "Received response: " + response.getResponseBody());
+					if (response.isError()) {
+						onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
+					} else {
+						onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
+					}
+				}
+			});
+			webServiceTask.execute(request);
+		}
 	}
 
 	private String sendDataSync(String key, String value) {
@@ -708,7 +709,14 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	}
 
-	private String sendDataWithoutWebViewSync(final ParamsList paramsList, final boolean existingData) {
+	/**
+	 * Returns the BKRequest object for making the async call to tags server
+	 * 
+	 * @param paramsList
+	 * @param existingData
+	 * @return
+	 */
+	private BKRequest getBkRequestObject(final ParamsList paramsList, final boolean existingData) {
 		CoreTagConfig config = new CoreTagConfig();
 		config.setSite(siteId);
 		config.setAppVersion(appVersion);
@@ -719,37 +727,56 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		CoreTagProcessor coreTagProcessor = new CoreTagProcessor(config, paramsList);
 		final String tagUrl = coreTagProcessor.getUrl();
-		BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
+		Logger.debug(TAG, "URL: " + tagUrl);
 
-			@Override
-			public void beforeSendingRequest() {
-				Logger.debug(TAG, "URL: " + tagUrl);
-			}
-
-			@Override
-			public void afterReceivingResponse(BKResponse response) {
-				Logger.debug(TAG, "Received response: " + response.getResponseBody());
-				if (response.isError()) {
-					onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
-				} else {
-					onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
-				}
-			}
-		});
 		BKRequest request = new BKRequest();
 		request.setUrl(tagUrl);
 		request.setUserAgent(userAgent);
 		request.setContentType("application/json");
 		request.setType(Type.GET);
-		BKResponse response;
-		String returnedMessage = null;
-		try {
-			response = webServiceTask.execute(request).get();
-			returnedMessage = response.getResponseBody();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+		return request;
+	}
+
+	/**
+	 * Makes a sync direct call to tags server using BKWebServiceRequestTask
+	 * 
+	 * @param paramsList
+	 * @param existingData
+	 * @return
+	 */
+	private String sendDataWithoutWebViewSync(final ParamsList paramsList, final boolean existingData) {
+
+		String returnedMessage = "Test string";
+		BKRequest request = getBkRequestObject(paramsList, existingData);
+
+		// Not making the actual call if dev mode is on
+		if (!devMode) {
+			BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
+
+				@Override
+				public void beforeSendingRequest() {
+				}
+
+				@Override
+				public void afterReceivingResponse(BKResponse response) {
+					Logger.debug(TAG, "Received response: " + response.getResponseBody());
+					if (response.isError()) {
+						onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
+					} else {
+						onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
+					}
+				}
+			});
+			BKResponse response;
+			try {
+				response = webServiceTask.execute(request).get();
+				returnedMessage = response.getResponseBody();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+
 		}
 		return returnedMessage;
 	}
@@ -816,8 +843,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			Iterator<Params> it = paramsList.iterator();
 			buffer = new StringBuffer();
 			String tailString = "&appVersion=" + appVersion;
-			if(!optOutPrivacy){
-				tailString = tailString+ "&adid=" + advertisingId;
+			if (!optOutPrivacy) {
+				tailString = tailString + "&adid=" + advertisingId;
 			}
 			int tailLength = tailString.length();
 			while (it.hasNext()) {

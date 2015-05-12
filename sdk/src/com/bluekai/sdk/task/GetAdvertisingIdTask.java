@@ -8,8 +8,8 @@ import com.bluekai.sdk.helpers.BKAdvertisingIdClient.AdInfo;
 import com.bluekai.sdk.utils.Logger;
 
 /**
- * AsyncTask to fetch the Advertising ID. Reading of advertising ID is a
- * blocking task, so it should always run on a background thread
+ * AsyncTask to fetch the Advertising ID in background. Reading of advertising ID is a
+ * blocking task, so it should always run on a background thread.
  * 
  * @author moulimukherjee
  *
@@ -33,7 +33,7 @@ public class GetAdvertisingIdTask extends AsyncTask<Void, Integer, AdInfo> {
 		try {
 			adInfo = BKAdvertisingIdClient.getAdvertisingIdInfo(context);
 		} catch (Exception e) {
-			Logger.error(TAG, e.getMessage(), e);
+			Logger.warn(TAG, e.getMessage(), e);
 		}
 		return adInfo;
 
