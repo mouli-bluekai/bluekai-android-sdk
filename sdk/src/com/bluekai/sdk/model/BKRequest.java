@@ -1,5 +1,11 @@
 package com.bluekai.sdk.model;
 
+/**
+ * Request object for making server calls using BKWebServiceRequestTask
+ * 
+ * @author moulimukherjee
+ *
+ */
 public class BKRequest {
 	public enum Type {
 		GET, POST

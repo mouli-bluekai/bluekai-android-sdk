@@ -2,6 +2,12 @@ package com.bluekai.sdk.bktag;
 
 import java.security.MessageDigest;
 
+/**
+ * Util methods for core tag
+ * 
+ * @author moulimukherjee
+ *
+ */
 public class CoreTagUtil {
 
 	/**

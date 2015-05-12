@@ -1,5 +1,11 @@
 package com.bluekai.sdk.model;
 
+/**
+ * Response object when making server calls using BKWebServiceRequestTask
+ * 
+ * @author moulimukherjee
+ *
+ */
 public class BKResponse {
 	// The response code, eg: 200, 201 etc.
 	private int responseCode;

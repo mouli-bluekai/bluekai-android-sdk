@@ -1,5 +1,11 @@
 package com.bluekai.sdk.bktag;
 
+/**
+ * The config object to be passed to CoreTagProcessor
+ * 
+ * @author moulimukherjee
+ *
+ */
 public class CoreTagConfig {
 	private String site;
 
@@ -21,7 +27,7 @@ public class CoreTagConfig {
 
 	private Boolean ignoreOutsideIframe;
 
-	private Boolean https = false;
+	private Boolean https = true;
 
 	private String advertisingId;
 

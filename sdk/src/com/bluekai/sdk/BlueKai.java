@@ -429,8 +429,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * Method to send data to BlueKai. Accepts a single key-value pair Rreturns
-	 * the campaign details
+	 * Method to send data to BlueKai. This makes a direct call instead of using web view. 
+	 * Accepts a single key-value pair Returns the campaign details
 	 * 
 	 * @param key
 	 *            Key

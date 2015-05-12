@@ -16,6 +16,12 @@ import android.os.AsyncTask;
 import com.bluekai.sdk.model.BKRequest;
 import com.bluekai.sdk.model.BKResponse;
 
+/**
+ * The async task to make http get or post calls in the background
+ * 
+ * @author moulimukherjee
+ *
+ */
 public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKResponse> {
 
 	private BKWebServiceListener listener;

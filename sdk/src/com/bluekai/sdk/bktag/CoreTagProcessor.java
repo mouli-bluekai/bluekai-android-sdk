@@ -10,6 +10,16 @@ import java.util.Map;
 import com.bluekai.sdk.model.Params;
 import com.bluekai.sdk.model.ParamsList;
 
+/**
+ * This class deduces the tags server url based upon the config object passed.
+ * The logic is based on the core tag JavaScript file.
+ * 
+ * There's difference in behavior of the bkrid value. In this, it is generated
+ * every time, while in the browser it's stored in a cookie.
+ * 
+ * @author moulimukherjee
+ *
+ */
 public class CoreTagProcessor {
 
 	public static final Map<String, String> configMapKeys = new HashMap<String, String>();
@@ -84,7 +94,9 @@ public class CoreTagProcessor {
 		int r = (int) (Math.random() * 9999999);
 		addParam("r", String.valueOf(r), null);
 
-		if (config.getAdvertisingId() != null) addParam("adid", config.getAdvertisingId(), null);
+		if (config.getAdvertisingId() != null) {
+			addParam("adid", config.getAdvertisingId(), null);
+		}
 
 	}
 
