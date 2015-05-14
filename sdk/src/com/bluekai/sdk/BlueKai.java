@@ -76,7 +76,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private final String SANDBOX_URL = "mobileproxy.bluekai.com/m-sandbox.html";
 
-	private final String DEFAULT_USER_AGENT = "Android Mobile ";
+	private final String DEFAULT_USER_AGENT = "Android Mobile";
 
 	private String siteId = "2";
 
@@ -135,7 +135,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.handler = handler;
 		this.httpsEnabled = useHttps;
 		this.useWebView = useWebView;
-		this.userAgent = DEFAULT_USER_AGENT + System.getProperty("http.agent");
+		this.userAgent = DEFAULT_USER_AGENT;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
 		Logger.debug(TAG, " onCreate BK URL --> " + (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL));
 		database = BlueKaiDataSource.getInstance(context);
