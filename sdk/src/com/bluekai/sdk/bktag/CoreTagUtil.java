@@ -2,6 +2,8 @@ package com.bluekai.sdk.bktag;
 
 import java.security.MessageDigest;
 
+import com.bluekai.sdk.utils.Logger;
+
 /**
  * Util methods for core tag
  * 
@@ -9,6 +11,8 @@ import java.security.MessageDigest;
  *
  */
 public class CoreTagUtil {
+
+	private static final String TAG = CoreTagUtil.class.getSimpleName();
 
 	/**
 	 * 
@@ -60,7 +64,7 @@ public class CoreTagUtil {
 			return new String(hashedBytes);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.warn(TAG, "Error hashing string", e);
 			return null;
 		}
 

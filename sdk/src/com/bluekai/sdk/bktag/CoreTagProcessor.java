@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.bluekai.sdk.model.Params;
 import com.bluekai.sdk.model.ParamsList;
+import com.bluekai.sdk.utils.Logger;
 
 /**
  * This class deduces the tags server url based upon the config object passed.
@@ -70,6 +71,8 @@ public class CoreTagProcessor {
 	private static final String PIXEL_URL = "http://tags.bluekai.com/";
 
 	private static final String PIXEL_URL_SECURE = "https://stags.bluekai.com/";
+
+	private static final String TAG = CoreTagProcessor.class.getSimpleName();
 
 	public CoreTagProcessor(CoreTagConfig configuration, ParamsList parameters) {
 		params = new ArrayList<String>();
@@ -138,7 +141,7 @@ public class CoreTagProcessor {
 					params.add(type + "=" + URLEncoder.encode(key, "UTF-8"));
 				}
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				Logger.warn(TAG, "Error encoding the parameters", e);
 			}
 
 		}

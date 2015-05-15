@@ -762,10 +762,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			try {
 				response = webServiceTask.execute(request).get();
 				returnedMessage = response.getResponseBody();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				Logger.warn(TAG, "Error sending request", e);
 			}
 
 		}
