@@ -139,19 +139,19 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		if (key.equals("enableDevMode")) {
+		if ("enableDevMode".equals(key)) {
 			Boolean oldDevMode = devMode;
 			devMode = sharedPreferences.getBoolean(key, oldDevMode);
-		} else if (key.equals("siteId")) {
+		} else if ("siteId".equals(key)) {
 			String oldSiteId = siteId;
 			siteId = sharedPreferences.getString(key, oldSiteId);
-		} else if (key.equals("useWebView")) {
+		} else if ("useWebView".equals(key)) {
 			Boolean oldUseWebView = useWebView;
 			useWebView = sharedPreferences.getBoolean(key, oldUseWebView);
-		} else if (key.equals("useHttps")) {
+		} else if ("useHttps".equals(key)) {
 			Boolean oldUseHttps = useHttps;
 			useHttps = sharedPreferences.getBoolean(key, oldUseHttps);
-		} else if (key.equals("sync")) {
+		} else if ("sync".equals(key)) {
 			Boolean oldSync = sync;
 			sync = sharedPreferences.getBoolean(key, oldSync);
 		}
