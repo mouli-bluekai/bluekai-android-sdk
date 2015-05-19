@@ -20,7 +20,6 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -598,15 +597,16 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private void sendExistingData(ParamsList paramsList) {
 		Logger.debug(TAG, "IsAllowDataPosting --> " + settings.isAllowDataPosting());
-		if (useWebView) {
-			if (settings.isAllowDataPosting()) {
+		if (settings.isAllowDataPosting()) {
+			if (useWebView) {
 				SendData sendData = new SendData(paramsList, handler, true);
 				Thread thread = new Thread(sendData);
 				thread.start();
+			} else {
+				sendDataWithoutWebView(paramsList, true);
 			}
-		} else {
-			sendDataWithoutWebView(paramsList, true);
 		}
+
 	}
 
 	private void sendData(String key, String value) {
