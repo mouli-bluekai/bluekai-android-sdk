@@ -20,19 +20,7 @@ public class CoreTagUtil {
 	 * @return
 	 */
 	public static String normalizeEmail(String email) {
-		String result = email;
-		try {
-			result = email.trim().toLowerCase();
-			String[] tmp = result.split("@");
-			String pre = tmp[0];
-			if (pre.indexOf("+") > -1) {
-				pre = pre.substring(0, pre.indexOf("+"));
-			}
-			result = pre + "@" + tmp[1];
-		} catch (Exception e) {
-
-		}
-		return result;
+		return email.trim().toLowerCase().replaceFirst("\\+[^@]*@", "@");
 	}
 
 	/**

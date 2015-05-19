@@ -44,12 +44,8 @@ public final class BKAdvertisingIdClient {
 	public static AdInfo getAdvertisingIdInfo(final Context context) throws Exception {
 		if (Looper.myLooper() == Looper.getMainLooper()) throw new IllegalStateException("Cannot be called from the main thread");
 
-		try {
-			PackageManager pm = context.getPackageManager();
-			pm.getPackageInfo("com.android.vending", 0);
-		} catch (Exception e) {
-			throw e;
-		}
+		PackageManager pm = context.getPackageManager();
+		pm.getPackageInfo("com.android.vending", 0);
 
 		AdvertisingConnection connection = new AdvertisingConnection();
 		Intent intent = new Intent("com.google.android.gms.ads.identifier.service.START");
