@@ -55,10 +55,11 @@ public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKRes
 
 				case GET:
 				default: {
-
-					String urlWithParams = url + ((url.indexOf("?") == -1) ? "?" : "&");
-					urlWithParams = urlWithParams + request.getPayload();
-					HttpGet httpGet = new HttpGet(urlWithParams);
+					if (request.getPayload() != null) {
+						url = url + ((url.indexOf("?") == -1) ? "?" : "&");
+						url = url + request.getPayload();
+					}
+					HttpGet httpGet = new HttpGet(url);
 					httpGet.setHeader("User-Agent", request.getUserAgent());
 					response = client.execute(httpGet);
 
