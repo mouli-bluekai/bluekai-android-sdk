@@ -75,7 +75,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private final String SANDBOX_URL = "mobileproxy.bluekai.com/m-sandbox.html";
 
-	private final String DEFAULT_USER_AGENT = "Android Mobile";
+	private final String DEFAULT_USER_AGENT = "Android Mobile BlueKaiSDK";
 
 	private String siteId = "2";
 
@@ -655,22 +655,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		// Not making the actual call if dev mode is on
 		if (!devMode) {
-			BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
-
-				@Override
-				public void beforeSendingRequest() {
-				}
-
-				@Override
-				public void afterReceivingResponse(BKResponse response) {
-					Logger.debug(TAG, "Received response: " + response.getResponseBody());
-					if (response.isError()) {
-						onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
-					} else {
-						onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
-					}
-				}
-			});
+			BKWebServiceRequestTask webServiceTask = getBKWebServiceRequestTaskObject(paramsList, existingData);
 			webServiceTask.execute(request);
 		}
 	}
@@ -729,6 +714,34 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
+	 * Returns the BKWebServiceRequestTask object for making calls to the tags
+	 * server
+	 * 
+	 * @param paramsList
+	 * @param existingData
+	 * @return
+	 */
+	private BKWebServiceRequestTask getBKWebServiceRequestTaskObject(final ParamsList paramsList, final boolean existingData) {
+		BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
+
+			@Override
+			public void beforeSendingRequest() {
+			}
+
+			@Override
+			public void afterReceivingResponse(BKResponse response) {
+				Logger.debug(TAG, "Received response: " + response.getResponseBody());
+				if (response.isError()) {
+					onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
+				} else {
+					onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
+				}
+			}
+		});
+		return webServiceTask;
+	}
+
+	/**
 	 * Makes a sync direct call to tags server using BKWebServiceRequestTask
 	 * 
 	 * @param paramsList
@@ -742,22 +755,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		// Not making the actual call if dev mode is on
 		if (!devMode) {
-			BKWebServiceRequestTask webServiceTask = new BKWebServiceRequestTask(new BKWebServiceListener() {
-
-				@Override
-				public void beforeSendingRequest() {
-				}
-
-				@Override
-				public void afterReceivingResponse(BKResponse response) {
-					Logger.debug(TAG, "Received response: " + response.getResponseBody());
-					if (response.isError()) {
-						onDataPosted(!response.isError(), "Problem posting data", existingData, paramsList);
-					} else {
-						onDataPosted(!response.isError(), "Data posted successfully. Response: " + response.getResponseBody(), existingData, paramsList);
-					}
-				}
-			});
+			BKWebServiceRequestTask webServiceTask = getBKWebServiceRequestTaskObject(paramsList, existingData);
 			BKResponse response;
 			try {
 				response = webServiceTask.execute(request).get();
