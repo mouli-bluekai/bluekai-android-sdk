@@ -996,8 +996,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 			@Override
 			public void onReceivedAdvertisingId(AdInfo adInfo) {
-				advertisingIdRetrieved = true;
 				if (adInfo != null) {
+					advertisingIdRetrieved = true;
 					advertisingId = adInfo.getId();
 					optOutPrivacy = adInfo.isLimitAdTrackingEnabled();
 				}

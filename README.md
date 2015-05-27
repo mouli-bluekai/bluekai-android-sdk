@@ -2,7 +2,7 @@
 
 ## Download the BlueKai SDK for Android
 
-- [Full SDK](http://bluekai.github.io/BlueKai_Android_SDK-20131122.zip)
+- [Full SDK](http://bluekai.github.io/bluekai_android_sdk-v2.zip)
       
 The current version of the SDK is 2.0.0.
 
