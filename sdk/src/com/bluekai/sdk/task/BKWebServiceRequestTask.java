@@ -45,7 +45,7 @@ public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKRes
 			switch (request.getType()) {
 				case POST: {
 					HttpPost post = new HttpPost(url);
-					post.setHeader("Content-type", request.getContentType());
+					post.setHeader("Content-Type", request.getContentType());
 					post.setHeader("User-Agent", request.getUserAgent());
 					post.setEntity(new StringEntity(request.getPayload(), "UTF-8"));
 					response = client.execute(post, localContext);
