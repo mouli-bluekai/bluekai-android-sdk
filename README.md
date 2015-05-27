@@ -4,7 +4,7 @@
 
 - [Full SDK](http://bluekai.github.io/BlueKai_Android_SDK-20131122.zip)
       
-The current version of the SDK is 1.0.1. 
+The current version of the SDK is 2.0.0.
 
 ## Updating the SDK 
 
@@ -122,19 +122,20 @@ it is created in `onCreate()` method of `MainActivity`
 
 
 ```java
-BlueKai bk = BlueKai.getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
+BlueKai bk = BlueKai.getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView);
 ```
 
 The `getInstance()` method accepts the following params:
 
 * Activity activity
 * Context appContext
-* Boolean devMode
-* Boolean httpsEnabled
+* boolean devMode
+* boolean httpsEnabled
 * String siteId
 * String version. This value can be “[app name]-[app version]”
 * BKViewListener listener
 * Handler handler
+* boolean useWebView (Recommended value to be true)
 
 ### Passing a value
 
@@ -183,9 +184,10 @@ public void onDataPosted(boolean success, String message){
 
 Return | Method | Description
 --- | --- | ---
-static BlueKai | getInstance() |Convenience method to initialize and get instance of BlueKai without arguments.
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. httpsEnabled flag will default to false.
+static BlueKai | getInstance() |Convenience method to initialize and get instance of BlueKai without arguments. Should be used to get the instance after it has already been created using other overloaded methods with parameters.
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. *Deprecated* in favor of overloaded getInstance method which also takes flag for useWebView
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. httpsEnabled flag will default to false. useWebView flag defauls to true for backwards compatibility. *Deprecated* in favor of overloaded getInstance method which also takes flag for useWebView.
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion, DataPostedListener listener, Handler handler, boolean useWebView) |Method to get Bluekai instance. The flag useWebView can be set to false to make direct calls to tags server without using web view. If it's true, then web view would be used. 
 void | putAll(Map map) |Convenience method to send a bunch of key-value pairs to BlueKai
 void | put(String key, String value) |Method to send data to BlueKai. Accepts a single key-value pair
 void | resume() |Method to resume BlueKai process after calling application resumes. To use in onResume() of the calling activity
@@ -209,7 +211,6 @@ String | getSiteId() | Get BlueKai site id
 void | setHandler(Handler handler) |Set Handler to get data posting updates
 Handler | getHandler() | Get Handler configured to get data posting updates
 void | showSettingsScreen(SettingsChangedListener listener) |Method to show BlueKai in-built opt-in screen. Requires `<activity android:name="com.bluekai.sdk.SettingsActivity" />` in AndroidManifest.xml to be present
-void | setFragmentManager(FragmentManager fm) |Set the fragment manager from calling FragmentActivity. Used when devMode is enabled to show webview in a popup dialog. Calling activity should be FragmentActivity
 
 # Sample Application 
 

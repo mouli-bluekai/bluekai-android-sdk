@@ -15,7 +15,8 @@ import android.os.Parcel;
 import android.os.RemoteException;
 
 /**
- * Class to read Google Advertising ID from Google Play Services
+ * Class to read Google Advertising ID from Google Play Services.
+ * Credit: http://stackoverflow.com/a/21567990/1632200
  * 
  * @author moulimukherjee
  *
