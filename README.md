@@ -211,7 +211,3 @@ building you should see the following:
 You can also test this directly by installing 
 
 - [BlueKai Sample Application](http://bluekai.github.io/images/android/BlueKaiActivity-release-unsigned.apk)
-   
-If monitoring network requests you would see something like: 
-```
-
