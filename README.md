@@ -50,7 +50,6 @@ these permissions in `AndroidManifest.xml`.
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 ```
 
 To show BlueKai in-built user opt-in opt-out screen, add the following
@@ -72,16 +71,6 @@ file.
 
 ```
 -keep class com.bluekai.** {*;}
-```
-
-BlueKai SDK uses Android support library. If your project does not use
-Android support library, proguard should be configured not to warn
-about support library. Add the following line to
-`proguard-project.txt` or proguard configuration file if it does not
-exist already
-
-```
--dontwarn android.support.**
 ```
 
 ### Import the SDK 

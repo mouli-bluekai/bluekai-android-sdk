@@ -5,7 +5,8 @@
 
 ### Enhancements
 - Added option to make direct calls to tags server instead of using the web view
-- All calls either using web view or direct call, would send the Advertising ID as adid parameter if add tracking is not limited in Google Settings
+- All calls either using web view or direct call, would send the Advertising ID as adid parameter if ad tracking is not limited in Google Settings
+- Removed dependency of the SDK on android support library
 
 ## v1.1 (06.12.2014)
 -----
