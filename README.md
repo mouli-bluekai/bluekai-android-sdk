@@ -2,9 +2,9 @@
 
 ## Download the BlueKai SDK for Android
 
-- [Full SDK](http://bluekai.github.io/BlueKai_Android_SDK-20131122.zip)
+- [Full SDK](http://bluekai.github.io/bluekai_android_sdk-v2.zip)
       
-The current version of the SDK is 1.0.1. 
+The current version of the SDK is 2.0.0.
 
 ## Updating the SDK 
 
@@ -50,7 +50,6 @@ these permissions in `AndroidManifest.xml`.
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
-<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 ```
 
 To show BlueKai in-built user opt-in opt-out screen, add the following
@@ -72,16 +71,6 @@ file.
 
 ```
 -keep class com.bluekai.** {*;}
-```
-
-BlueKai SDK uses Android support library. If your project does not use
-Android support library, proguard should be configured not to warn
-about support library. Add the following line to
-`proguard-project.txt` or proguard configuration file if it does not
-exist already
-
-```
--dontwarn android.support.**
 ```
 
 ### Import the SDK 
@@ -122,19 +111,22 @@ it is created in `onCreate()` method of `MainActivity`
 
 
 ```java
-BlueKai bk = BlueKai.getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler);
+BlueKai bk = BlueKai.getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView);
 ```
 
 The `getInstance()` method accepts the following params:
 
 * Activity activity
 * Context appContext
-* Boolean devMode
-* Boolean httpsEnabled
-* String siteId
-* String version. This value can be “[app name]-[app version]”
-* BKViewListener listener
-* Handler handler
+* boolean devMode - Flag to enable devMode for debugging. If this is on, then actual calls are not made but the URLs are displayed in toast
+* boolean httpsEnabled - Flag to determine if https or http would be used to connect
+* String siteId - The site ID
+* String version - This value can be “[app name]-[app version]”
+* DataPostedListener listener - Listener callback implementation to be called when data is sent
+* Handler handler - Handler object from UI Thread
+* boolean useWebView - Flag determines if a web view would be used or direct calls would be made to tags server. It is recommended to set this value to true
+
+**NOTE:** For all the calls, irrespective of whether using webview or making a direct call, the SDK will try to fetch the Advertising ID and send it as 'adid' query parameter. If user has limited ad tracking enabled from Google Settings or it is not supported by the device then the value will not be sent. 
 
 ### Passing a value
 
@@ -183,9 +175,10 @@ public void onDataPosted(boolean success, String message){
 
 Return | Method | Description
 --- | --- | ---
-static BlueKai | getInstance() |Convenience method to initialize and get instance of BlueKai without arguments.
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance
-static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |Method to get BlueKai instance. httpsEnabled flag will default to false.
+static BlueKai | getInstance() |Convenience method to initialize and get instance of BlueKai without arguments. Should be used to get the instance after it has already been created using other overloaded methods with parameters.
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId,String appVersion, DataPostedListener listener, Handler handler) |*Deprecated* in favor of overloaded getInstance method which also takes flag for useWebView. Method to get BlueKai instance.
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, String siteId,String appVersion, DataPostedListener listener, Handler handler) |*Deprecated* in favor of overloaded getInstance method which also takes flag for useWebView. Method to get BlueKai instance. httpsEnabled flag will default to false. useWebView flag defauls to true for backwards compatibility.
+static BlueKai | getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion, DataPostedListener listener, Handler handler, boolean useWebView) | **Recommended** method to get Bluekai instance. The flag useWebView can be set to false to make direct calls to tags server without using web view. If it's true, then web view would be used. 
 void | putAll(Map map) |Convenience method to send a bunch of key-value pairs to BlueKai
 void | put(String key, String value) |Method to send data to BlueKai. Accepts a single key-value pair
 void | resume() |Method to resume BlueKai process after calling application resumes. To use in onResume() of the calling activity
@@ -209,7 +202,6 @@ String | getSiteId() | Get BlueKai site id
 void | setHandler(Handler handler) |Set Handler to get data posting updates
 Handler | getHandler() | Get Handler configured to get data posting updates
 void | showSettingsScreen(SettingsChangedListener listener) |Method to show BlueKai in-built opt-in screen. Requires `<activity android:name="com.bluekai.sdk.SettingsActivity" />` in AndroidManifest.xml to be present
-void | setFragmentManager(FragmentManager fm) |Set the fragment manager from calling FragmentActivity. Used when devMode is enabled to show webview in a popup dialog. Calling activity should be FragmentActivity
 
 # Sample Application 
 
@@ -221,7 +213,3 @@ building you should see the following:
 You can also test this directly by installing 
 
 - [BlueKai Sample Application](http://bluekai.github.io/images/android/BlueKaiActivity-release-unsigned.apk)
-   
-If monitoring network requests you would see something like: 
-```
-

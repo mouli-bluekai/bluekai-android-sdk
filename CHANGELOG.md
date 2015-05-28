@@ -1,3 +1,13 @@
+## v2.0 (05.27.2015)
+-----
+### Bug Fix
+- Fixed memory leak in which every time the resume method is called it does not spawn a new web view
+
+### Enhancements
+- Added option to make direct calls to tags server instead of using the web view
+- All calls either using web view or direct call, would send the Advertising ID as adid parameter if ad tracking is not limited in Google Settings
+- Removed dependency of the SDK on android support library
+
 ## v1.1 (06.12.2014)
 -----
 

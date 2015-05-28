@@ -15,15 +15,11 @@
  */
 package com.bluekai.sampleapp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -34,61 +30,56 @@ import android.widget.Toast;
 
 import com.bluekai.sdk.BlueKai;
 import com.bluekai.sdk.listeners.DataPostedListener;
-import com.bluekai.sdk.model.DevSettings;
 
-public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
+public class BlueKaiTab extends FragmentActivity implements DataPostedListener, OnSharedPreferenceChangeListener {
 
 	private Button sendButton = null;
-	private Button clearButton = null;
-	//private Button pushButton = null;
-	private EditText keyText = null;
-	private EditText valueText = null;
-	//private EditText pairsCountText = null;
 
-	private boolean devMode = false;
-	private boolean useHttps = false;
+	private Button clearButton = null;
+
+	// private Button pushButton = null;
+	private EditText keyText = null;
+
+	private EditText valueText = null;
+
+	// private EditText pairsCountText = null;
+
+	private Boolean devMode = false;
+
 	private String siteId = null;
+
 	private String appVersion = "4.1.6";
 
 	private BlueKai bk = null;
 
-	private Context context;
-	private DataSource database;
+	protected SharedPreferences preferences;
+
+	private Boolean useWebView = false;
+
+	private boolean useHttps = false;
+
+	private boolean sync = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_blue_kai);
-			this.context = getApplicationContext();
 
-			database = DataSource.getInstance(context);
-			DevSettings devSettings = database.getDevSettings();
-			if (devSettings == null) {
-				try {
-					Resources resources = this.getResources();
-					AssetManager assetManager = resources.getAssets();
-					InputStream inputStream = assetManager.open("settings.properties");
-					Properties properties = new Properties();
-					properties.load(inputStream);
-					devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
-					useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
-					siteId = properties.getProperty("siteid");
-				} catch (IOException e) {
-					Log.e("BlueKaiSampleApp", "Error loading properties. Default values will be loaded from SDK", e);
-				}
-			} else {
-				siteId = devSettings.getBkurl();
-				devMode = devSettings.isDevMode();
-				useHttps = devSettings.isHttpsEnabled();
-			}
+			readPreferences();
+			preferences.registerOnSharedPreferenceChangeListener(this);
 
-			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
-			bk.setFragmentManager(getSupportFragmentManager());
+			siteId = preferences.getString("siteId", "2");
+			devMode = preferences.getBoolean("enableDevMode", false);
+			useWebView = preferences.getBoolean("useWebView", false);
+			useHttps = preferences.getBoolean("useHttps", false);
+			sync = preferences.getBoolean("sync", false);
+
+			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 
 			keyText = (EditText) findViewById(R.id.keyText);
 			valueText = (EditText) findViewById(R.id.valueText);
-			//pairsCountText = (EditText) findViewById(R.id.pairs_count);
+			// pairsCountText = (EditText) findViewById(R.id.pairs_count);
 
 			clearButton = (Button) findViewById(R.id.clear);
 			clearButton.setOnClickListener(new OnClickListener() {
@@ -110,15 +101,22 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 					String value = valueText.getText().toString();
 					if (key == null || key.trim().equals("")) {
 						keyText.requestFocus();
-						Toast.makeText(context, "Key is empty. Please enter a value", Toast.LENGTH_LONG).show();
+						Toast.makeText(BlueKaiTab.this, "Key is empty. Please enter a value", Toast.LENGTH_LONG).show();
 					} else if (value == null || value.trim().equals("")) {
 						valueText.requestFocus();
-						Toast.makeText(context, "Value is empty. Please enter a value", Toast.LENGTH_LONG).show();
+						Toast.makeText(BlueKaiTab.this, "Value is empty. Please enter a value", Toast.LENGTH_LONG).show();
 					} else {
-						bk.put(key, value);
+						if (sync) {
+							String response = bk.putSync(key, value);
+							Toast.makeText(BlueKaiTab.this, response, Toast.LENGTH_SHORT).show();
+						} else {
+							bk.put(key, value);
+						}
+
 					}
 				}
 			});
+
 		} catch (Exception ex) {
 			Log.e("BlueKaiTab", "Error while creating", ex);
 		}
@@ -127,33 +125,43 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		database = DataSource.getInstance(context);
-		DevSettings devSettings = database.getDevSettings();
-		if (devSettings == null) {
-			try {
-				Resources resources = this.getResources();
-				AssetManager assetManager = resources.getAssets();
-				InputStream inputStream = assetManager.open("settings.properties");
-				Properties properties = new Properties();
-				properties.load(inputStream);
-				useHttps = Boolean.parseBoolean(properties.getProperty("useHttps"));
-				devMode = Boolean.parseBoolean(properties.getProperty("devmode"));
-				siteId = properties.getProperty("siteid");
-			} catch (IOException e) {
-				Log.e("BlueKaiSampleApp", "Error loading properties. Default values will be loaded from SDK", e);
-			}
-		} else {
-			siteId = devSettings.getBkurl();
-			devMode = devSettings.isDevMode();
-			useHttps = devSettings.isHttpsEnabled();
-		}
-		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId + " -- Use Https --> " + useHttps);
-		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler());
+
+		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId);
+		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 		bk.resume();
 	}
 
 	@Override
 	public void onDataPosted(boolean success, String message) {
 		Log.d("BlueKaiSampleApp", String.valueOf(success) + " :: " + message);
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		if ("enableDevMode".equals(key)) {
+			Boolean oldDevMode = devMode;
+			devMode = sharedPreferences.getBoolean(key, oldDevMode);
+		} else if ("siteId".equals(key)) {
+			String oldSiteId = siteId;
+			siteId = sharedPreferences.getString(key, oldSiteId);
+		} else if ("useWebView".equals(key)) {
+			Boolean oldUseWebView = useWebView;
+			useWebView = sharedPreferences.getBoolean(key, oldUseWebView);
+		} else if ("useHttps".equals(key)) {
+			Boolean oldUseHttps = useHttps;
+			useHttps = sharedPreferences.getBoolean(key, oldUseHttps);
+		} else if ("sync".equals(key)) {
+			Boolean oldSync = sync;
+			sync = sharedPreferences.getBoolean(key, oldSync);
+		}
+
+	}
+
+	// Reads the preferences from settings
+	private void readPreferences() {
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		// Loading the default shared preferences
+		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 	}
 }
