@@ -118,13 +118,15 @@ The `getInstance()` method accepts the following params:
 
 * Activity activity
 * Context appContext
-* boolean devMode
-* boolean httpsEnabled
-* String siteId
-* String version. This value can be “[app name]-[app version]”
-* BKViewListener listener
-* Handler handler
-* boolean useWebView (Recommended value to be true)
+* boolean devMode - Flag to enable devMode for debugging. If this is on, then actual calls are not made but the URLs are displayed in toast
+* boolean httpsEnabled - Flag to determine if https or http would be used to connect
+* String siteId - The site ID
+* String version - This value can be “[app name]-[app version]”
+* DataPostedListener listener - Listener callback implementation to be called when data is sent
+* Handler handler - Handler object from UI Thread
+* boolean useWebView - Flag determines if a web view would be used or direct calls would be made to tags server. It is recommended to set this value to true
+
+**NOTE:** For all the calls, irrespective of whether using webview or making a direct call, the SDK will try to fetch the Advertising ID and send it as 'adid' query parameter. If user has limited ad tracking enabled from Google Settings or it is not supported by the device then the value will not be sent. 
 
 ### Passing a value
 
