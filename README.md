@@ -133,6 +133,11 @@ The `getInstance()` method accepts the following params:
 ```java
 bk.put(key, value);
 ```
+**NOTE:** For data to be sent, if using BlueKai's SettingsActivity to show the opt-in screen, user should have the 'Allow BlueKai to receive my data' setting checked. This setting can also be set/unset programmatically using the following method. Setting it to true allows collection and sending of data, whereas if it's false, there's no collection or sending of data.
+
+```java
+bk.setOptInPreference(true);
+```
 
 ### Passing multiple values
 
