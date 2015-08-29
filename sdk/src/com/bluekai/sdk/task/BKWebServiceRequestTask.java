@@ -1,26 +1,29 @@
 package com.bluekai.sdk.task;
 
+import android.os.AsyncTask;
+import android.util.Log;
+import android.util.Pair;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
-import android.os.AsyncTask;
-
 import com.bluekai.sdk.model.BKRequest;
 import com.bluekai.sdk.model.BKResponse;
 
 /**
  * The async task to make http get or post calls in the background
- * 
- * @author moulimukherjee
  *
+ * @author moulimukherjee
  */
 public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKResponse> {
 
@@ -40,31 +43,50 @@ public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKRes
 		BKResponse bkResponse = new BKResponse();
 
 		String url = request.getUrl();
-
+		Log.d("BKWebServiceRequestTask", request.toString());
 		try {
 			switch (request.getType()) {
-				case POST: {
+				case POST:
 					HttpPost post = new HttpPost(url);
-					post.setHeader("Content-Type", request.getContentType());
-					post.setHeader("User-Agent", request.getUserAgent());
 					post.setEntity(new StringEntity(request.getPayload(), "UTF-8"));
+					if (request.getHeaders() != null) {
+						for (Pair<String, String> header : request.getHeaders()) {
+							post.setHeader(header.first, header.second);
+						}
+					}
 					response = client.execute(post, localContext);
-
 					break;
-				}
+				case PUT:
+					HttpPut put = new HttpPut(url);
+					put.setEntity(new StringEntity(request.getPayload(), "UTF-8"));
+					if (request.getHeaders() != null) {
+						for (Pair<String, String> header : request.getHeaders()) {
+							put.setHeader(header.first, header.second);
+						}
+					}
+					response = client.execute(put, localContext);
+					break;
+
+				case DELETE:
+					HttpDelete delete = new HttpDelete(url);
+					if (request.getHeaders() != null) {
+						for (Pair<String, String> header : request.getHeaders()) {
+							delete.setHeader(header.first, header.second);
+						}
+					}
+					response = client.execute(delete, localContext);
+					break;
 
 				case GET:
-				default: {
-					if (request.getPayload() != null) {
-						url = url + ((url.indexOf("?") == -1) ? "?" : "&");
-						url = url + request.getPayload();
-					}
+				default:
 					HttpGet httpGet = new HttpGet(url);
-					httpGet.setHeader("User-Agent", request.getUserAgent());
-					response = client.execute(httpGet);
-
+					if (request.getHeaders() != null) {
+						for (Pair<String, String> header : request.getHeaders()) {
+							httpGet.setHeader(header.first, header.second);
+						}
+					}
+					response = client.execute(httpGet, localContext);
 					break;
-				}
 			}
 			if (response != null) {
 				HttpEntity httpEntity = response.getEntity();
@@ -85,14 +107,16 @@ public class BKWebServiceRequestTask extends AsyncTask<BKRequest, Integer, BKRes
 
 	@Override
 	protected void onPostExecute(BKResponse result) {
-		super.onPostExecute(result);
-		listener.afterReceivingResponse(result);
+		if (listener != null) {
+			listener.afterReceivingResponse(result);
+		}
 	}
 
 	@Override
 	protected final void onPreExecute() {
-		super.onPreExecute();
-		listener.beforeSendingRequest();
+		if (listener != null) {
+			listener.beforeSendingRequest();
+		}
 	}
 
 }

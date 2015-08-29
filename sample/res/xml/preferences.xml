@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference
         android:defaultValue="false"
@@ -8,7 +8,7 @@
         android:title="Enable Developer Mode" />
 
     <EditTextPreference
-        android:defaultValue="2"
+        android:defaultValue="24316"
         android:key="siteId"
         android:summary="The Site ID to be used for calling tags API"
         android:title="Site ID" />
@@ -26,9 +26,25 @@
         android:title="Use HTTPS" />
     <CheckBoxPreference
         android:defaultValue="false"
+        android:dependency="useWebView"
         android:key="sync"
         android:summary="Check this to make synchronous calls"
-        android:title="Make Synced direct calls" 
-        android:dependency="useWebView"/>
+        android:title="Make Synced direct calls" />
+
+    <EditTextPreference
+        android:defaultValue="486"
+        android:key="partnerId"
+        android:summary="The Partner ID to be used for the universal opt out"
+        android:title="Partner ID" />
+
+    <EditTextPreference
+        android:key="wsPublicKey"
+        android:summary="The public key to be used for calling universal opt out endpoint"
+        android:title="Public Key" />
+
+    <EditTextPreference
+        android:key="wsPrivateKey"
+        android:summary="The private key to be used for calling universal opt out endpoint"
+        android:title="Private Key" />
 
 </PreferenceScreen>

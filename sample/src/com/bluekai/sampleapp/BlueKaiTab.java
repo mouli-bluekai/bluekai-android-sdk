@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bluekai.sdk.BlueKai;
+import com.bluekai.sdk.BlueKaiData;
 import com.bluekai.sdk.listeners.DataPostedListener;
 
 public class BlueKaiTab extends FragmentActivity implements DataPostedListener, OnSharedPreferenceChangeListener {
@@ -60,6 +61,14 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 
 	private boolean sync = false;
 
+	private Integer partnerId = null;
+
+	private String wsPublicKey = null;
+
+	private String wsPrivateKey = null;
+
+	BlueKaiData blueKaiData = null;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		try {
@@ -74,8 +83,15 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 			useWebView = preferences.getBoolean("useWebView", false);
 			useHttps = preferences.getBoolean("useHttps", false);
 			sync = preferences.getBoolean("sync", false);
+			partnerId = Integer.parseInt(preferences.getString("partnerId", "486"));
+			wsPublicKey = preferences.getString("wsPublicKey", null);
+			wsPrivateKey = preferences.getString("wsPrivateKey", null);
 
-			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
+			blueKaiData = new BlueKaiData();
+			blueKaiData.setBkKey(wsPublicKey);
+			blueKaiData.setBkSecretKey(wsPrivateKey);
+
+			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView, blueKaiData);
 
 			keyText = (EditText) findViewById(R.id.keyText);
 			valueText = (EditText) findViewById(R.id.valueText);
@@ -127,7 +143,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 		super.onResume();
 
 		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId);
-		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
+		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView, blueKaiData);
 		bk.resume();
 	}
 
@@ -154,6 +170,15 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 		} else if ("sync".equals(key)) {
 			Boolean oldSync = sync;
 			sync = sharedPreferences.getBoolean(key, oldSync);
+		} else if ("partnerId".equals(key)) {
+			Integer oldPartnerId = partnerId;
+			partnerId = Integer.parseInt(sharedPreferences.getString("partnerId", String.valueOf(oldPartnerId)));
+		} else if ("wsPublicKey".equals(key)) {
+			String oldWsPublicKey = wsPublicKey;
+			wsPublicKey = sharedPreferences.getString("wsPublicKey", oldWsPublicKey);
+		} else if ("wsPrivateKey".equals(key)) {
+			String oldWsPrivateKey = wsPrivateKey;
+			wsPrivateKey = sharedPreferences.getString("wsPrivateKey", oldWsPrivateKey);
 		}
 
 	}

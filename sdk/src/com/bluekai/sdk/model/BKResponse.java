@@ -40,4 +40,12 @@ public class BKResponse {
 		this.responseBody = responseBody;
 	}
 
+	@Override
+	public String toString() {
+		return "BKResponse{" +
+				"responseCode=" + responseCode +
+				", error=" + error +
+				", responseBody='" + responseBody + '\'' +
+				'}';
+	}
 }

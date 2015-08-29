@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,6 +30,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -51,6 +53,7 @@ import com.bluekai.sdk.task.BKAdvertisingIdListener;
 import com.bluekai.sdk.task.BKWebServiceListener;
 import com.bluekai.sdk.task.BKWebServiceRequestTask;
 import com.bluekai.sdk.task.GetAdvertisingIdTask;
+import com.bluekai.sdk.utils.BKRequestHelper;
 import com.bluekai.sdk.utils.Logger;
 
 public class BlueKai implements SettingsChangedListener, BKViewListener {
@@ -76,6 +79,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	private final String SANDBOX_URL = "mobileproxy.bluekai.com/m-sandbox.html";
 
 	private final String DEFAULT_USER_AGENT = "Android Mobile BlueKaiSDK";
+
+	private final String OPT_OUT_BASE_URL = "https://api.tags.bluekai.com/api/v2.0/users";
 
 	private String siteId = "2";
 
@@ -106,23 +111,16 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private boolean advertisingIdRetrieved = false;
 
+	private BlueKaiData blueKaiData;
+
 	private BlueKai() {
 		database = BlueKaiDataSource.getInstance(context);
 		database.setSettingsChangedListener(this);
 		settings = database.getSettings();
 	}
 
-	private BlueKai(Activity activity, Context context, boolean devMode, String siteId, String appVersion, DataPostedListener listener, Handler handler) {
-		this(activity, context, devMode, false, siteId, appVersion, listener, handler);
-	}
-
 	private BlueKai(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId, String appVersion, DataPostedListener listener,
-			Handler handler) {
-		this(activity, context, devMode, false, siteId, appVersion, listener, handler, true);
-	}
-
-	private BlueKai(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId, String appVersion, DataPostedListener listener,
-			Handler handler, boolean useWebView) {
+					Handler handler, boolean useWebView, BlueKaiData data) {
 		this.activity = activity;
 		this.context = context;
 		this.devMode = devMode;
@@ -135,6 +133,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.httpsEnabled = useHttps;
 		this.useWebView = useWebView;
 		this.userAgent = DEFAULT_USER_AGENT;
+		this.blueKaiData = data;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
 		Logger.debug(TAG, " onCreate BK URL --> " + (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL));
 		database = BlueKaiDataSource.getInstance(context);
@@ -162,77 +161,61 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Method to get BlueKai instance
-	 * 
-	 * @param activity
-	 *            Calling application activity reference
-	 * @param context
-	 *            Calling application context
-	 * @param devMode
-	 *            Developer mode. Set to enable webview to popup in a dialog.
-	 *            Strictly for developer purposes only
-	 * @param siteId
-	 *            BlueKai site id
-	 * @param appVersion
-	 *            Version of the calling application
-	 * @param listener
-	 *            DataPostedListener. Calling activity should implement this
-	 *            interface
-	 * @param handler
-	 *            Handler. Android os handler.
 	 *
+	 * @param activity   Calling application activity reference
+	 * @param context    Calling application context
+	 * @param devMode    Developer mode. Set to enable webview to popup in a dialog.
+	 *                   Strictly for developer purposes only
+	 * @param siteId     BlueKai site id
+	 * @param appVersion Version of the calling application
+	 * @param listener   DataPostedListener. Calling activity should implement this
+	 *                   interface
+	 * @param handler    Handler. Android os handler.
 	 * @return BlueKai instance
 	 */
 	@Deprecated
 	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, String siteId, String appVersion, DataPostedListener listener,
-			Handler handler) {
-		Logger.debug(TAG, "Called get instance...");
-		if (instance == null) {
-			instance = new BlueKai(activity, context, devMode, siteId, appVersion, listener, handler);
-		} else {
-			instance.setActivity(activity);
-			instance.setAppContext(context);
-			instance.setDevMode(devMode);
-			instance.setSiteId(siteId);
-			instance.setAppVersion(appVersion);
-			instance.setDataPostedListener(listener);
-			instance.setHandler(handler);
-		}
-		return instance;
+									  Handler handler) {
+		return getInstance(activity, context, devMode, false, siteId, appVersion, listener, handler);
 	}
 
 	/**
 	 * Method to get BlueKai instance
 	 *
-	 * @param activity
-	 *            Calling application activity reference
-	 * @param context
-	 *            Calling application context
-	 * @param devMode
-	 *            Developer mode. Set to enable webview to popup in a dialog.
-	 *            Strictly for developer purposes only
-	 * @param httpsEnabled
-	 *            Secure mode. Set to enable data transfer to BlueKai over
-	 *            https.
-	 * @param siteId
-	 *            BlueKai site id
-	 * @param appVersion
-	 *            Version of the calling application
-	 * @param listener
-	 *            DataPostedListener. Calling activity should implement this
-	 *            interface
-	 * @param handler
-	 *            Handler. Android os handler.
-	 *
+	 * @param activity     Calling application activity reference
+	 * @param context      Calling application context
+	 * @param devMode      Developer mode. Set to enable webview to popup in a dialog. Strictly for developer purposes only
+	 * @param httpsEnabled Secure mode. Set to enable data transfer to BlueKai over https.
+	 * @param siteId       BlueKai site id
+	 * @param appVersion   Version of the calling application
+	 * @param listener     DataPostedListener. Calling activity should implement this interface
+	 * @param handler      Handler. Android os handler.
 	 * @return BlueKai instance
 	 */
 	@Deprecated
 	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion,
-			DataPostedListener listener, Handler handler) {
+									  DataPostedListener listener, Handler handler) {
 		return getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, true);
 	}
 
 	/**
-	 * 
+	 * @param activity     Calling application activity reference
+	 * @param context      Calling application context
+	 * @param devMode      Developer mode. Set to enable webview to popup in a dialog. Strictly for developer purposes only
+	 * @param httpsEnabled Secure mode. Set to enable data transfer to BlueKai over https.
+	 * @param siteId       BlueKai site id
+	 * @param appVersion   Version of the calling application
+	 * @param listener     DataPostedListener. Calling activity should implement this interface
+	 * @param handler      Handler. Android os handler.
+	 * @param useWebView   Flag if set to true, then the calls will be made using webview else native calls would be made to send phints
+	 * @return
+	 */
+	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion,
+									  DataPostedListener listener, Handler handler, boolean useWebView) {
+		return getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView, null);
+	}
+
+	/**
 	 * @param activity
 	 * @param context
 	 * @param devMode
@@ -242,14 +225,14 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * @param listener
 	 * @param handler
 	 * @param useWebView
-	 * @param userAgent
+	 * @param data
 	 * @return
 	 */
 	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion,
-			DataPostedListener listener, Handler handler, boolean useWebView) {
+									  DataPostedListener listener, Handler handler, boolean useWebView, BlueKaiData data) {
 		Logger.debug(TAG, "Called get instance...");
 		if (instance == null) {
-			instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView);
+			instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView, data);
 		} else {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
@@ -260,6 +243,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			instance.setDataPostedListener(listener);
 			instance.setHandler(handler);
 			instance.setUseWebView(useWebView);
+			instance.setBlueKaiData(data);
 		}
 		return instance;
 	}
@@ -271,7 +255,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * cases, first create a BlueKai instance using the other two getInstance()
 	 * methods that take arguments and then subsequently use this method to get
 	 * previously created instance.
-	 * 
+	 *
 	 * @return BlueKai instance
 	 */
 	public static BlueKai getInstance() {
@@ -285,12 +269,16 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Set the calling activity reference
-	 * 
-	 * @param activity
-	 *            Calling activity reference
+	 *
+	 * @param activity Calling activity reference
 	 */
 	public void setActivity(Activity activity) {
 		this.activity = activity;
+	}
+
+
+	public void setBlueKaiData(BlueKaiData blueKaiData) {
+		this.blueKaiData = blueKaiData;
 	}
 
 	/**
@@ -304,9 +292,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Set the calling application context
-	 * 
-	 * @param context
-	 *            Context
+	 *
+	 * @param context Context
 	 */
 	public void setAppContext(Context context) {
 		this.context = context;
@@ -326,9 +313,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Set developer mode (True or False)
-	 * 
-	 * @param devMode
-	 *            Developer mode
+	 *
+	 * @param devMode Developer mode
 	 */
 	public void setDevMode(boolean devMode) {
 		this.devMode = devMode;
@@ -345,9 +331,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Set BlueKai site id
-	 * 
-	 * @param siteId
-	 *            Site ID
+	 *
+	 * @param siteId Site ID
 	 */
 	public void setSiteId(String siteId) {
 		this.siteId = siteId;
@@ -364,9 +349,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Set the calling application's version
-	 * 
-	 * @param appVersion
-	 *            Application version
+	 *
+	 * @param appVersion Application version
 	 */
 	public void setAppVersion(String appVersion) {
 		this.appVersion = appVersion;
@@ -384,9 +368,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Set the DataPostedListener to get notifications about status of a data
 	 * posting. Calling activity should implement this interface
-	 * 
-	 * @param listener
-	 *            Listener implementation
+	 *
+	 * @param listener Listener implementation
 	 */
 	public void setDataPostedListener(DataPostedListener listener) {
 		this.listener = listener;
@@ -406,18 +389,11 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.handler = handler;
 	}
 
-	public Handler getHandler() {
-		return handler;
-	}
-
 	/**
 	 * Method to send data to BlueKai. Accepts a single key-value pair
 	 *
-	 * 
-	 * @param key
-	 *            Key
-	 * @param value
-	 *            Value
+	 * @param key   Key
+	 * @param value Value
 	 */
 	public void put(String key, String value) {
 		sendData(key, value);
@@ -426,11 +402,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Method to send data to BlueKai. This makes a direct call instead of using
 	 * web view. Accepts a single key-value pair Returns the campaign details
-	 * 
-	 * @param key
-	 *            Key
-	 * @param value
-	 *            Value
+	 *
+	 * @param key   Key
+	 * @param value Value
 	 */
 	public String putSync(String key, String value) {
 		return sendDataSync(key, value);
@@ -438,11 +412,10 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Convenience method to send a bunch of key-value pairs to BlueKai
-	 * 
-	 * @param map
-	 *            Map with keys and values
+	 *
+	 * @param map Map with keys and values
 	 * @deprecated as of release v1.0.3. Replaced by
-	 *             {@link #putAll(java.util.Map)}
+	 * {@link #putAll(java.util.Map)}
 	 */
 	@Deprecated
 	public void put(Map<String, String> map) {
@@ -452,8 +425,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Convenience method to send a bunch of key-value pairs to BlueKai
 	 *
-	 * @param map
-	 *            Map with keys and values
+	 * @param map Map with keys and values
 	 */
 	public void putAll(Map<String, String> map) {
 		sendData(map);
@@ -461,9 +433,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Method to show BlueKai in-build opt-in screen
-	 * 
-	 * @param listener
-	 *            Listener to get callback on settings change
+	 *
+	 * @param listener Listener to get callback on settings change
 	 */
 	public void showSettingsScreen(SettingsChangedListener listener) {
 		if (activity == null || context == null) {
@@ -478,11 +449,10 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Method to set user opt-in or opt-out preference
-	 * 
-	 * @param optIn
-	 *            Opt-in (true or false)
+	 *
+	 * @param optIn Opt-in (true or false)
 	 * @Deprecated as of release v1.0.3. Replaced by
-	 *             {@link #setOptInPreference(boolean)}
+	 * {@link #setOptInPreference(boolean)}
 	 */
 	@Deprecated
 	public void setOptIn(boolean optIn) {
@@ -492,8 +462,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Method to set user opt-in or opt-out preference
 	 *
-	 * @param optIn
-	 *            Opt-in (true or false)
+	 * @param optIn Opt-in (true or false)
 	 */
 	public void setOptInPreference(boolean optIn) {
 		this.settings.setAllowDataPosting(optIn);
@@ -516,7 +485,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * is sent to BlueKai over https
 	 *
 	 * @return httpsEnabled flag that enables/disables data being sent to
-	 *         BlueKai over https.
+	 * BlueKai over https.
 	 */
 	public boolean isHttpsEnabled() {
 		return httpsEnabled;
@@ -525,7 +494,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Method to change httpsEnabled settings. If httpsEnabled is set then data
 	 * is sent to BlueKai over https
-	 * 
+	 *
 	 * @param httpsEnabled
 	 */
 	public void setHttpsEnabled(boolean httpsEnabled) {
@@ -533,7 +502,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	public boolean useWebView() {
@@ -541,7 +509,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * 
 	 * @param useWebView
 	 */
 	public void setUseWebView(boolean useWebView) {
@@ -549,7 +516,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	public String getUserAgent() {
@@ -557,7 +523,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	/**
-	 * 
 	 * @param userAgent
 	 */
 	public void setUserAgent(String userAgent) {
@@ -645,7 +610,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Makes an async call to tags server using BKWebServiceRequestTask
-	 * 
+	 *
 	 * @param paramsList
 	 * @param existingData
 	 */
@@ -684,7 +649,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Returns the BKRequest object for making the async call to tags server
-	 * 
+	 *
 	 * @param paramsList
 	 * @param existingData
 	 * @return
@@ -707,8 +672,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		BKRequest request = new BKRequest();
 		request.setUrl(tagUrl);
-		request.setUserAgent(userAgent);
-		request.setContentType("application/json");
+		request.addHeader("User-Agent", userAgent);
 		request.setType(Type.GET);
 		return request;
 	}
@@ -716,7 +680,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	/**
 	 * Returns the BKWebServiceRequestTask object for making calls to the tags
 	 * server
-	 * 
+	 *
 	 * @param paramsList
 	 * @param existingData
 	 * @return
@@ -743,7 +707,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Makes a sync direct call to tags server using BKWebServiceRequestTask
-	 * 
+	 *
 	 * @param paramsList
 	 * @param existingData
 	 * @return
@@ -951,7 +915,61 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.settings = settings;
 		if (settings.isAllowDataPosting()) {
 			checkForExistingData();
+		} else {
+			universalOptOut();
 		}
+	}
+
+	/**
+	 * Method makes a call to a BlueKai endpoint to delete the user profile created at BlueKai and opt out the user universally.
+	 * This will try to use the android advertising ID from the device. If the user has limited the ad tracking
+	 * (i.e. preventing the use of adveritising ID), then the user Identifier if provided (in BlueKaiData object)
+	 * while initializing the BlueKai instance would be used. If even that is not provided, then this call will not do anything,
+	 * and opting out would just mean no further data would be sent to BlueKai.
+	 */
+	public void universalOptOut() {
+		String userIdParamName = null;
+		String userIdParamValue = null;
+
+		if (!optOutPrivacy && advertisingId != null) {
+			userIdParamName = "adid";
+			userIdParamValue = advertisingId;
+		} else if (blueKaiData != null && blueKaiData.getUserIdentifier() != null) {
+			userIdParamName = blueKaiData.getUserIdentifier().first;
+			userIdParamValue = blueKaiData.getUserIdentifier().second;
+		}
+
+		if (userIdParamName != null && userIdParamValue != null) {
+			String url = OPT_OUT_BASE_URL + "/" + userIdParamName + "/" + userIdParamValue;
+			BKRequest optOutRequest = new BKRequest();
+			optOutRequest.setType(Type.DELETE);
+			optOutRequest.addHeader("Content-Type", "application/json");
+			optOutRequest.addHeader("User-Agent", userAgent);
+			optOutRequest.addHeader("X-SiteID", siteId);
+			optOutRequest.addHeader("X-Public", blueKaiData.getBkKey());
+			optOutRequest.setUrl(url);
+
+			String stringToSign = BKRequestHelper.getStringToSign(optOutRequest);
+			Log.d(TAG, "String to sign: " + stringToSign);
+			String signature = BKRequestHelper.signUrl(stringToSign, blueKaiData.getBkSecretKey());
+			Log.d(TAG, "Signature is: " + signature);
+			optOutRequest.addHeader("X-Hash", signature);
+
+			BKWebServiceRequestTask task = new BKWebServiceRequestTask(null);
+
+			try {
+				BKResponse response = task.execute(optOutRequest).get();
+				Log.d(TAG, response.toString());
+				if (response.getResponseCode() != 200) {
+					throw new RuntimeException("Dummy dummy dummy");
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	private synchronized void showBlueKaiDialog(String url, boolean existingData, ParamsList paramsList, BKViewListener listener) {
@@ -974,7 +992,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 					dialog.dismiss();
 				}
 			});
-			alert.show().getWindow().setLayout(600, 600);;
+			alert.show().getWindow().setLayout(600, 600);
 		} else {
 			blueKaiView.loadUrl(url, existingData, paramsList);
 		}
@@ -1003,6 +1021,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 				}
 
 			}
+
 		});
 		task.execute();
 

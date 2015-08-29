@@ -17,6 +17,7 @@ package com.bluekai.sampleapp;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.widget.TabHost;
@@ -30,7 +31,9 @@ public class BlueKaiActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		WebView.setWebContentsDebuggingEnabled(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			WebView.setWebContentsDebuggingEnabled(true);
+		}
 
 		TabHost tabHost = getTabHost();
 		TabHost.TabSpec spec;
