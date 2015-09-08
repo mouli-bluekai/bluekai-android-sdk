@@ -921,13 +921,17 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	/**
 	 * Method makes an async call to a BlueKai endpoint to delete the user profile created at BlueKai and opt out the user universally.
-	 * Upon receiving a response, it calls the same {@link DataPostedListener#onDataPosted(boolean, String)} method
+	 * Upon receiving a response, it calls {@link DataPostedListener#onDataPosted(boolean, String)} method on receiving response.
 	 * This will try to use the android advertising ID from the device. If the user has limited the ad tracking
 	 * (i.e. preventing the use of advertising ID), then the user Identifier if provided (in BlueKaiData object)
 	 * while initializing the BlueKai instance would be used. If even that is not provided, then this call will not do anything,
 	 * and opting out would just mean no further data would be sent to BlueKai.
+	 *
+	 * @param blueKaiData Object containing the bluekai user key and secret key for signing the request.
+	 *                    Also containing the mapping for a different user identifier in case the android ID is not present
+	 * @param listener    if not null, then the onDataPosted method of this object is called
 	 */
-	public void universalOptOut(BlueKaiData blueKaiData) {
+	public void universalOptOut(BlueKaiData blueKaiData, final DataPostedListener listener) {
 		BKRequest optOutRequest = getOptOutRequestObject(blueKaiData);
 
 		BKWebServiceRequestTask task = new BKWebServiceRequestTask(new BKWebServiceListener() {
@@ -938,7 +942,10 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 			@Override
 			public void afterReceivingResponse(BKResponse response) {
-				listener.onDataPosted(response.getResponseCode() == 200, response.getResponseBody());
+				Logger.debug(TAG, "Response from opt out: " + response.getResponseBody());
+				if (listener != null) {
+					listener.onDataPosted(response.getResponseCode() == 200, response.getResponseCode() == 200 ? "Success" : "Failed");
+				}
 			}
 
 		});
@@ -953,8 +960,11 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 * (i.e. preventing the use of advertising ID), then the user Identifier if provided (in BlueKaiData object)
 	 * while initializing the BlueKai instance would be used. If even that is not provided, then this call will not do anything,
 	 * and opting out would just mean no further data would be sent to BlueKai.
+	 *
+	 * @param blueKaiData Object containing the bluekai user key and secret key for signing the request.
+	 *                    Also containing the mapping for a different user identifier
+	 * @return boolean true if the request was successful else returns false
 	 */
-
 	public boolean universalOptOutSync(BlueKaiData blueKaiData) {
 		BKRequest optOutRequest = getOptOutRequestObject(blueKaiData);
 
