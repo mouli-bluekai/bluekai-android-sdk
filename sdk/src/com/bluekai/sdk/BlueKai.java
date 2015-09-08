@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -916,20 +915,73 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		if (settings.isAllowDataPosting()) {
 			checkForExistingData();
 		} else {
-			universalOptOut();
+			universalOptOutSync(blueKaiData);
 		}
 	}
 
 	/**
-	 * Method makes a call to a BlueKai endpoint to delete the user profile created at BlueKai and opt out the user universally.
+	 * Method makes an async call to a BlueKai endpoint to delete the user profile created at BlueKai and opt out the user universally.
+	 * Upon receiving a response, it calls the same {@link DataPostedListener#onDataPosted(boolean, String)} method
 	 * This will try to use the android advertising ID from the device. If the user has limited the ad tracking
-	 * (i.e. preventing the use of adveritising ID), then the user Identifier if provided (in BlueKaiData object)
+	 * (i.e. preventing the use of advertising ID), then the user Identifier if provided (in BlueKaiData object)
 	 * while initializing the BlueKai instance would be used. If even that is not provided, then this call will not do anything,
 	 * and opting out would just mean no further data would be sent to BlueKai.
 	 */
-	public void universalOptOut() {
+	public void universalOptOut(BlueKaiData blueKaiData) {
+		BKRequest optOutRequest = getOptOutRequestObject(blueKaiData);
+
+		BKWebServiceRequestTask task = new BKWebServiceRequestTask(new BKWebServiceListener() {
+			@Override
+			public void beforeSendingRequest() {
+
+			}
+
+			@Override
+			public void afterReceivingResponse(BKResponse response) {
+				listener.onDataPosted(response.getResponseCode() == 200, response.getResponseBody());
+			}
+
+		});
+
+		task.execute(optOutRequest);
+
+	}
+
+	/**
+	 * Method makes a synced call to a BlueKai endpoint to delete the user profile created at BlueKai and opt out the user universally.
+	 * This will try to use the android advertising ID from the device. If the user has limited the ad tracking
+	 * (i.e. preventing the use of advertising ID), then the user Identifier if provided (in BlueKaiData object)
+	 * while initializing the BlueKai instance would be used. If even that is not provided, then this call will not do anything,
+	 * and opting out would just mean no further data would be sent to BlueKai.
+	 */
+
+	public boolean universalOptOutSync(BlueKaiData blueKaiData) {
+		BKRequest optOutRequest = getOptOutRequestObject(blueKaiData);
+
+		BKWebServiceRequestTask task = new BKWebServiceRequestTask(null);
+
+		try {
+			BKResponse response = task.execute(optOutRequest).get();
+			Logger.debug(TAG, response.getResponseBody());
+			return response.getResponseCode() == 200;
+		} catch (InterruptedException e) {
+			Logger.error(TAG, e.getMessage(), e);
+		} catch (ExecutionException e) {
+			Logger.error(TAG, e.getMessage(), e);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the request object for making universal opt out call
+	 *
+	 * @param blueKaiData
+	 * @return
+	 */
+	private BKRequest getOptOutRequestObject(BlueKaiData blueKaiData) {
 		String userIdParamName = null;
 		String userIdParamValue = null;
+		BKRequest optOutRequest = null;
 
 		if (!optOutPrivacy && advertisingId != null) {
 			userIdParamName = "adid";
@@ -941,7 +993,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 		if (userIdParamName != null && userIdParamValue != null) {
 			String url = OPT_OUT_BASE_URL + "/" + userIdParamName + "/" + userIdParamValue;
-			BKRequest optOutRequest = new BKRequest();
+			optOutRequest = new BKRequest();
 			optOutRequest.setType(Type.DELETE);
 			optOutRequest.addHeader("Content-Type", "application/json");
 			optOutRequest.addHeader("User-Agent", userAgent);
@@ -950,26 +1002,11 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			optOutRequest.setUrl(url);
 
 			String stringToSign = BKRequestHelper.getStringToSign(optOutRequest);
-			Log.d(TAG, "String to sign: " + stringToSign);
+			Logger.debug(TAG, "String to sign: " + stringToSign);
 			String signature = BKRequestHelper.signUrl(stringToSign, blueKaiData.getBkSecretKey());
-			Log.d(TAG, "Signature is: " + signature);
 			optOutRequest.addHeader("X-Hash", signature);
-
-			BKWebServiceRequestTask task = new BKWebServiceRequestTask(null);
-
-			try {
-				BKResponse response = task.execute(optOutRequest).get();
-				Log.d(TAG, response.toString());
-				if (response.getResponseCode() != 200) {
-					throw new RuntimeException("Dummy dummy dummy");
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
 		}
-
+		return optOutRequest;
 	}
 
 	private synchronized void showBlueKaiDialog(String url, boolean existingData, ParamsList paramsList, BKViewListener listener) {
