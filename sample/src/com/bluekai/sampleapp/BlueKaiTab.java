@@ -90,6 +90,9 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 			blueKaiData = new BlueKaiData();
 			blueKaiData.setBkKey(wsPublicKey);
 			blueKaiData.setBkSecretKey(wsPrivateKey);
+			// An external user identifier can also be used for universal opt out
+			// By default the android advertising ID would be used
+			//blueKaiData.setUserIdentifier(new Pair<String, String>("e_id_s", "<hash_value>"));
 
 			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 
