@@ -468,6 +468,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		if (database != null) {
 			database.createSettings(this.settings);
 		}
+		if (!optIn) {
+			universalOptOutSync(blueKaiData);
+		}
 	}
 
 	/**
@@ -934,24 +937,25 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	public void universalOptOut(BlueKaiData blueKaiData, final DataPostedListener listener) {
 		BKRequest optOutRequest = getOptOutRequestObject(blueKaiData);
 
-		BKWebServiceRequestTask task = new BKWebServiceRequestTask(new BKWebServiceListener() {
-			@Override
-			public void beforeSendingRequest() {
+		if (optOutRequest != null) {
+			BKWebServiceRequestTask task = new BKWebServiceRequestTask(new BKWebServiceListener() {
+				@Override
+				public void beforeSendingRequest() {
 
-			}
-
-			@Override
-			public void afterReceivingResponse(BKResponse response) {
-				Logger.debug(TAG, "Response from opt out: " + response.getResponseBody());
-				if (listener != null) {
-					listener.onDataPosted(response.getResponseCode() == 200, response.getResponseCode() == 200 ? "Success" : "Failed");
 				}
-			}
 
-		});
+				@Override
+				public void afterReceivingResponse(BKResponse response) {
+					Logger.debug(TAG, "Response from opt out: " + response.getResponseBody());
+					if (listener != null) {
+						listener.onDataPosted(response.getResponseCode() == 200, response.getResponseCode() == 200 ? "Success" : "Failed");
+					}
+				}
 
-		task.execute(optOutRequest);
+			});
 
+			task.execute(optOutRequest);
+		}
 	}
 
 	/**
@@ -968,16 +972,18 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	public boolean universalOptOutSync(BlueKaiData blueKaiData) {
 		BKRequest optOutRequest = getOptOutRequestObject(blueKaiData);
 
-		BKWebServiceRequestTask task = new BKWebServiceRequestTask(null);
+		if (optOutRequest != null) {
+			BKWebServiceRequestTask task = new BKWebServiceRequestTask(null);
 
-		try {
-			BKResponse response = task.execute(optOutRequest).get();
-			Logger.debug(TAG, response.getResponseBody());
-			return response.getResponseCode() == 200;
-		} catch (InterruptedException e) {
-			Logger.error(TAG, e.getMessage(), e);
-		} catch (ExecutionException e) {
-			Logger.error(TAG, e.getMessage(), e);
+			try {
+				BKResponse response = task.execute(optOutRequest).get();
+				Logger.debug(TAG, response.getResponseBody());
+				return response.getResponseCode() == 200;
+			} catch (InterruptedException e) {
+				Logger.error(TAG, e.getMessage(), e);
+			} catch (ExecutionException e) {
+				Logger.error(TAG, e.getMessage(), e);
+			}
 		}
 		return false;
 	}
@@ -1015,6 +1021,8 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			Logger.debug(TAG, "String to sign: " + stringToSign);
 			String signature = BKRequestHelper.signUrl(stringToSign, blueKaiData.getBkSecretKey());
 			optOutRequest.addHeader("X-Hash", signature);
+		} else {
+			Logger.warn(TAG, "No valid user identifier present");
 		}
 		return optOutRequest;
 	}

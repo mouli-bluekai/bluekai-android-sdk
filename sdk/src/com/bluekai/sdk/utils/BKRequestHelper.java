@@ -17,7 +17,6 @@ import com.bluekai.sdk.model.BKRequest;
  * Created by moulimukherjee.
  */
 public class BKRequestHelper {
-	private final static char[] hexArray = "0123456789abcdef".toCharArray();
 	public final static String algoritmString = "HmacSHA256";
 
 	public static final String TAG = BKRequestHelper.class.getSimpleName();
