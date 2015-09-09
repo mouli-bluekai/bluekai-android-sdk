@@ -110,8 +110,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 
 	private boolean advertisingIdRetrieved = false;
 
-	private BlueKaiData blueKaiData;
-
 	private BlueKai() {
 		database = BlueKaiDataSource.getInstance(context);
 		database.setSettingsChangedListener(this);
@@ -119,7 +117,7 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	}
 
 	private BlueKai(Activity activity, Context context, boolean devMode, boolean useHttps, String siteId, String appVersion, DataPostedListener listener,
-					Handler handler, boolean useWebView, BlueKaiData data) {
+					Handler handler, boolean useWebView) {
 		this.activity = activity;
 		this.context = context;
 		this.devMode = devMode;
@@ -132,7 +130,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.httpsEnabled = useHttps;
 		this.useWebView = useWebView;
 		this.userAgent = DEFAULT_USER_AGENT;
-		this.blueKaiData = data;
 		Logger.debug(TAG, " onCreate Dev Mode ? " + devMode);
 		Logger.debug(TAG, " onCreate BK URL --> " + (useHttps ? HTTPS : HTTP) + (devMode ? SANDBOX_URL : BASE_URL));
 		database = BlueKaiDataSource.getInstance(context);
@@ -211,27 +208,9 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 	 */
 	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion,
 									  DataPostedListener listener, Handler handler, boolean useWebView) {
-		return getInstance(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView, null);
-	}
-
-	/**
-	 * @param activity
-	 * @param context
-	 * @param devMode
-	 * @param httpsEnabled
-	 * @param siteId
-	 * @param appVersion
-	 * @param listener
-	 * @param handler
-	 * @param useWebView
-	 * @param data
-	 * @return
-	 */
-	public static BlueKai getInstance(Activity activity, Context context, boolean devMode, boolean httpsEnabled, String siteId, String appVersion,
-									  DataPostedListener listener, Handler handler, boolean useWebView, BlueKaiData data) {
 		Logger.debug(TAG, "Called get instance...");
 		if (instance == null) {
-			instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView, data);
+			instance = new BlueKai(activity, context, devMode, httpsEnabled, siteId, appVersion, listener, handler, useWebView);
 		} else {
 			instance.setActivity(activity);
 			instance.setAppContext(context);
@@ -242,7 +221,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 			instance.setDataPostedListener(listener);
 			instance.setHandler(handler);
 			instance.setUseWebView(useWebView);
-			instance.setBlueKaiData(data);
 		}
 		return instance;
 	}
@@ -275,10 +253,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.activity = activity;
 	}
 
-
-	public void setBlueKaiData(BlueKaiData blueKaiData) {
-		this.blueKaiData = blueKaiData;
-	}
 
 	/**
 	 * Get calling activity reference.
@@ -467,9 +441,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.settings.setAllowDataPosting(optIn);
 		if (database != null) {
 			database.createSettings(this.settings);
-		}
-		if (!optIn) {
-			universalOptOutSync(blueKaiData);
 		}
 	}
 
@@ -917,8 +888,6 @@ public class BlueKai implements SettingsChangedListener, BKViewListener {
 		this.settings = settings;
 		if (settings.isAllowDataPosting()) {
 			checkForExistingData();
-		} else {
-			universalOptOutSync(blueKaiData);
 		}
 	}
 

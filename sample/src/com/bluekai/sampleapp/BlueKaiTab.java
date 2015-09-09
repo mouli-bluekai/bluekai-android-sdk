@@ -91,7 +91,7 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 			blueKaiData.setBkKey(wsPublicKey);
 			blueKaiData.setBkSecretKey(wsPrivateKey);
 
-			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView, blueKaiData);
+			bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 
 			keyText = (EditText) findViewById(R.id.keyText);
 			valueText = (EditText) findViewById(R.id.valueText);
@@ -138,12 +138,44 @@ public class BlueKaiTab extends FragmentActivity implements DataPostedListener, 
 		}
 	}
 
+	/**
+	 * Example method which prevents bluekai from sending any more data and also deletes the user profile at bluekai
+	 * {@link BlueKai#universalOptOut(BlueKaiData, DataPostedListener)} method can also be used for an async call instead
+	 * of the {@link BlueKai#universalOptOutSync(BlueKaiData)} method as shown below
+	 */
+	public void optOut() {
+		bk.setOptInPreference(false);
+
+		// Making a sync call to bluekai for opting out
+		if (bk.universalOptOutSync(blueKaiData)) {
+			Toast.makeText(this, "User successfully opted out universally", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(this, "Error while opting out", Toast.LENGTH_SHORT).show();
+		}
+
+		/*
+		For making an async call instead
+
+		bk.universalOptOut(blueKaiData, new DataPostedListener() {
+
+			@Override
+			public void onDataPosted(boolean success, String message) {
+				if (success) {
+					Toast.makeText(BlueKaiTab.this, "User successfully opted out universally", Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(BlueKaiTab.this, "Error while opting out", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		 */
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 
 		Log.d("BlueKaiSampleApp", "On Resume --> DevMode ---> " + devMode + " -- Site ID --> " + siteId);
-		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView, blueKaiData);
+		bk = BlueKai.getInstance(this, this, devMode, useHttps, siteId, appVersion, this, new Handler(), useWebView);
 		bk.resume();
 	}
 
