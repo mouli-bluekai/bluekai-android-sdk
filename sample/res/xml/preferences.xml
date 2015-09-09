@@ -8,7 +8,7 @@
         android:title="Enable Developer Mode" />
 
     <EditTextPreference
-        android:defaultValue="24316"
+        android:defaultValue="2"
         android:key="siteId"
         android:summary="The Site ID to be used for calling tags API"
         android:title="Site ID" />
